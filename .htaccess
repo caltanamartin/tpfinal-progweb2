@@ -1,0 +1,8 @@
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+RewriteRule ^login$    index.php?controller=auth&method=verLogin [QSA,L]
+RewriteRule ^registro$ index.php?controller=auth&method=verRegistro [QSA,L]
+
+RewriteRule ^([^/]+)(/([^/]+))?$ index.php?controller=$1&method=$3 [QSA,L]
