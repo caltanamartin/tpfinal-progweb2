@@ -21,6 +21,10 @@ class Configurator {
         return new AuthController($this->getRenderer(), $this->getUsuarioModel(), new Request());
     }
 
+    public function getPerfilController() {
+        return new PerfilController($this->getRenderer());
+    }
+
     private function getDatabase()
     {
         return new MyDatabase(

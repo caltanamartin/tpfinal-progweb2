@@ -1,7 +1,7 @@
 {{>header}}
-<div class="h-screen overflow-hidden flex flex-col bg-gray-50">
+<div class="min-h-screen flex flex-col bg-gray-50 pt-16">
     <div class="flex-1 flex items-center justify-center px-4">
-        <div class="w-full max-w-sm">
+        <div class="w-full max-w-md">
             <div class="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
                 <div class="flex justify-center gap-3 mb-6">
                     <div class="w-10 h-10 rounded-full" style="background: #f74114;"></div>
@@ -19,8 +19,8 @@
                 {{/error}}
                 <form method='POST'>
                     <div class="mb-5">
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
-                        <input type="email" id="email" name="email" placeholder="tu@email.com"
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-1.5">Nombre de usuario</label>
+                        <input type="text" id="username" name="username" placeholder="Tu nombre de usuario"
                                class="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition-all duration-200">
                     </div>
                     <div class="mb-6">
@@ -35,7 +35,7 @@
                 </form>
                 <p class="text-center text-sm text-gray-400 mt-6">
                     ¿Todavía no tenés cuenta?
-                    <a href="/registro" class="text-[#007ca6] font-medium transition-colors duration-200 cursor-pointer"">Registrate</a>
+                    <a href="/registro" class="text-[#007ca6] font-medium transition-colors duration-200 cursor-pointer">Registrate</a>
                 </p>
             </div>
         </div>

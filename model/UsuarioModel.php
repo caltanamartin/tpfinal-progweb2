@@ -9,6 +9,13 @@ class UsuarioModel
         $this->database = $database;
     }
 
+    public function getByUsername($username)
+    {
+        $sql = "SELECT * FROM usuarios WHERE username = '$username'";
+        $result = $this->database->query($sql);
+        return !empty($result) ? $result[0] : null;
+    }
+
     public function getByEmail($email)
     {
         $sql = "SELECT * FROM usuarios WHERE email = '$email'";
@@ -16,9 +23,10 @@ class UsuarioModel
         return !empty($result) ? $result[0] : null;
     }
 
-    public function crear($email, $nombre, $password)
+    public function crear($email, $nombre, $username, $password, $anioNacimiento, $sexo, $pais, $ciudad, $fotoPerfil)
     {
-        $sql = "INSERT INTO usuarios (email, nombre, password) VALUES ('$email', '$nombre', '$password')";
+        $sql = "INSERT INTO usuarios (email, nombre, username, password, anio_nacimiento, sexo, pais, ciudad, foto_perfil)
+                VALUES ('$email', '$nombre', '$username', '$password', '$anioNacimiento', '$sexo', '$pais', '$ciudad', '$fotoPerfil')";
         return $this->database->execute($sql);
     }
 }

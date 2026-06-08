@@ -13,12 +13,20 @@ create table aldea_vikinga.guerreros
 
 create table aldea_vikinga.usuarios
 (
-    id        int auto_increment
+    id             int auto_increment
         primary key,
-    email     varchar(100)                          not null,
-    nombre    varchar(100)                          not null,
-    password  varchar(255)                          not null,
-    creado_en timestamp default current_timestamp() not null
+    email          varchar(100)                          not null,
+    nombre         varchar(100)                          not null,
+    username       varchar(50)                           not null,
+    password       varchar(255)                          not null,
+    anio_nacimiento date                                  default null,
+    sexo           enum('Masculino','Femenino','Prefiero no cargarlo') default 'Prefiero no cargarlo',
+    pais           varchar(100)                           default '',
+    ciudad         varchar(100)                           default '',
+    foto_perfil    varchar(255)                           default null,
+    creado_en      timestamp default current_timestamp() not null,
+    unique (email),
+    unique (username)
 );
 
 INSERT INTO aldea_vikinga.guerreros (id, nombre, apodo, clan, fuerza, creado_en) VALUES (23, 'Aslaug', 'La Reina', 'Volsung', 82, '2026-04-28 21:52:34');

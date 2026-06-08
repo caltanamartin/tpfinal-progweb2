@@ -1,0 +1,57 @@
+{{>header}}
+<div class="min-h-screen flex flex-col bg-gray-50 pt-16">
+    <div class="flex-1 flex items-start justify-center px-4 py-8">
+        <div class="w-full max-w-md">
+            <div class="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+                <div class="flex flex-col items-center mb-6">
+                    {{#usuario.foto_perfil}}
+                    <img src="/{{usuario.foto_perfil}}" alt="Foto de perfil"
+                         class="w-24 h-24 rounded-full object-cover border-4 border-[#00b582] shadow-md mb-4">
+                    {{/usuario.foto_perfil}}
+                    {{^usuario.foto_perfil}}
+                    <div class="w-24 h-24 rounded-full bg-[#00b582] flex items-center justify-center text-white text-3xl font-bold shadow-md mb-4">
+                        {{usuario.nombre.0}}
+                    </div>
+                    {{/usuario.foto_perfil}}
+                    <h2 class="text-xl font-bold text-gray-800">{{usuario.username}}</h2>
+                    <p class="text-sm text-gray-500">{{usuario.nombre}}</p>
+                </div>
+
+                <div class="border-t border-gray-100 pt-6 space-y-4">
+                    <div>
+                        <p class="text-xs uppercase tracking-wide text-gray-400 font-medium">Email</p>
+                        <p class="text-sm text-gray-700">{{usuario.email}}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs uppercase tracking-wide text-gray-400 font-medium">Fecha de nacimiento</p>
+                        <p class="text-sm text-gray-700">{{usuario.anio_nacimiento}}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs uppercase tracking-wide text-gray-400 font-medium">Sexo</p>
+                        <p class="text-sm text-gray-700">{{usuario.sexo}}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs uppercase tracking-wide text-gray-400 font-medium">País</p>
+                        <p class="text-sm text-gray-700">{{usuario.pais}}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs uppercase tracking-wide text-gray-400 font-medium">Ciudad</p>
+                        <p class="text-sm text-gray-700">{{usuario.ciudad}}</p>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-100 pt-6 mt-6 space-y-4">
+                    <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl">
+                        <span class="text-sm text-gray-600 font-medium">Puntaje total</span>
+                        <span class="text-lg font-bold text-[#00b582]">0</span>
+                    </div>
+                    <div class="flex justify-between items-center p-4 bg-gray-50 rounded-xl">
+                        <span class="text-sm text-gray-600 font-medium">Partidas jugadas</span>
+                        <span class="text-lg font-bold text-[#007ca6]">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{>footer}}
+</div>
