@@ -11,7 +11,11 @@ class HomeController
 
     public function ver()
     {
-        Log::info("HomeController::ver");
-        $this->renderer->render("landing", ["esHome"=> "true"]);
+        $usuario = $_SESSION['usuario'] ?? null;
+        $data = ["esHome" => true];
+        if ($usuario) {
+            $data["usuario"] = $usuario;
+        }
+        $this->renderer->render("landing", $data);
     }
 }

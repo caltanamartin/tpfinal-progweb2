@@ -2,7 +2,15 @@ RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
-RewriteRule ^login$    index.php?controller=auth&method=verLogin [QSA,L]
-RewriteRule ^registro$ index.php?controller=auth&method=verRegistro [QSA,L]
+RewriteRule ^login$              index.php?controller=auth&method=verLogin [L,QSA]
+RewriteRule ^registro$           index.php?controller=auth&method=verRegistro [L,QSA]
+RewriteRule ^logout$             index.php?controller=auth&method=logout [L,QSA]
 
-RewriteRule ^([^/]+)(/([^/]+))?$ index.php?controller=$1&method=$3 [QSA,L]
+RewriteRule ^vikingo/alta$       index.php?controller=vikingo&method=alta [L,QSA]
+RewriteRule ^vikingo/procesarAlta$ index.php?controller=vikingo&method=procesarAlta [L,QSA]
+RewriteRule ^vikingo/editar$     index.php?controller=vikingo&method=editar [L,QSA]
+RewriteRule ^vikingo/eliminar$   index.php?controller=vikingo&method=eliminar [L,QSA]
+RewriteRule ^vikingo/procesarEditar$ index.php?controller=vikingo&method=procesarEditar [L,QSA]
+RewriteRule ^vikingo$            index.php?controller=vikingo&method=ver [L,QSA]
+
+RewriteRule ^$                   index.php?controller=home&method=ver [L,QSA]

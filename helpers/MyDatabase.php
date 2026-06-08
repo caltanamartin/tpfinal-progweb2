@@ -9,17 +9,15 @@ class MyDatabase
         $this->conexion = new mysqli($hostname, $username, $password, $database);
     }
 
-    public function query($sql, $params = [])
+    public function query($sql)
     {
-        $stmt = $this->conexion->prepare($sql);
-        $stmt->execute($params);
-        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $result = $this->conexion->query($sql);
+        return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 
-    public function execute($sql, $params = [])
+    public function execute($sql)
     {
-        $stmt = $this->conexion->prepare($sql);
-        $stmt->execute($params);
+        $this->conexion->query($sql);
         return $this->conexion->affected_rows;
     }
 

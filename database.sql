@@ -11,6 +11,16 @@ create table aldea_vikinga.guerreros
     creado_en timestamp default current_timestamp() not null
 );
 
+create table aldea_vikinga.usuarios
+(
+    id        int auto_increment
+        primary key,
+    email     varchar(100)                          not null,
+    nombre    varchar(100)                          not null,
+    password  varchar(255)                          not null,
+    creado_en timestamp default current_timestamp() not null
+);
+
 INSERT INTO aldea_vikinga.guerreros (id, nombre, apodo, clan, fuerza, creado_en) VALUES (23, 'Aslaug', 'La Reina', 'Volsung', 82, '2026-04-28 21:52:34');
 INSERT INTO aldea_vikinga.guerreros (id, nombre, apodo, clan, fuerza, creado_en) VALUES (24, 'Harald', 'Cabellera Hermosa', 'Noruega', 94, '2026-04-28 21:52:34');
 INSERT INTO aldea_vikinga.guerreros (id, nombre, apodo, clan, fuerza, creado_en) VALUES (26, 'Astrid', 'La Valiente (casi)', 'Hedeby', 87, '2026-04-28 21:52:34');
