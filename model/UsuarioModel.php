@@ -29,4 +29,19 @@ class UsuarioModel
                 VALUES ('$email', '$nombre', '$username', '$password', '$anioNacimiento', '$sexo', '$pais', '$ciudad', '$fotoPerfil')";
         return $this->database->execute($sql);
     }
+
+    public function actualizar($username, $cambios)
+    {
+        if (empty($cambios)) {
+            return 0;
+        }
+
+        $sets = [];
+        foreach ($cambios as $campo => $valor) {
+            $sets[] = "$campo = '$valor'";
+        }
+
+        $sql = "UPDATE usuarios SET " . implode(', ', $sets) . " WHERE username = '$username'";
+        return $this->database->execute($sql);
+    }
 }

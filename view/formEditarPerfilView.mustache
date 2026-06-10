@@ -1,0 +1,90 @@
+{{>header}}
+<div class="min-h-screen flex flex-col bg-gray-50 pt-16">
+    <div class="flex-1 flex items-start justify-center px-4 py-8">
+        <div class="w-full max-w-md">
+            <div class="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="flex flex-col items-center mb-6">
+                        <label for="foto_perfil" class="relative group cursor-pointer mb-4">
+                            <img id="preview_foto" alt="Foto de perfil"
+                                 src="{{#usuario.foto_perfil}}/{{usuario.foto_perfil}}{{/usuario.foto_perfil}}"
+                                 class="w-24 h-24 rounded-full object-cover border-4 border-[#00b582] shadow-md {{^usuario.foto_perfil}}hidden{{/usuario.foto_perfil}}">
+                            <div id="preview_placeholder"
+                                 class="w-24 h-24 rounded-full bg-[#00b582] flex items-center justify-center text-white text-3xl font-bold shadow-md {{#usuario.foto_perfil}}hidden{{/usuario.foto_perfil}}">
+                                {{usuario.nombre.0}}
+                            </div>
+                            <div class="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                <span class="text-white text-xl">✏️</span>
+                            </div>
+                        </label>
+                        <input type="file" id="foto_perfil" name="foto_perfil" accept="image/*" class="hidden">
+                        <h2 class="text-xl font-bold text-gray-800">{{usuario.username}}</h2>
+                    </div>
+
+                    <div class="border-t border-gray-100 pt-6 space-y-4">
+                        <div>
+                            <label for="nombre" class="text-xs uppercase tracking-wide text-gray-400 font-medium">Nombre</label>
+                            <input type="text" id="nombre" name="nombre" value="{{usuario.nombre}}"
+                                   class="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 transition-all duration-200" required>
+                        </div>
+                        <div>
+                            <label for="email" class="text-xs uppercase tracking-wide text-gray-400 font-medium">Email</label>
+                            <input type="email" id="email" name="email" value="{{usuario.email}}"
+                                   class="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 transition-all duration-200" required>
+                        </div>
+                        <div>
+                            <label for="anio_nacimiento" class="text-xs uppercase tracking-wide text-gray-400 font-medium">Fecha de nacimiento</label>
+                            <input type="date" id="anio_nacimiento" name="anio_nacimiento" value="{{usuario.anio_nacimiento}}"
+                                   class="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 transition-all duration-200" required>
+                        </div>
+                        <div>
+                            <label class="text-xs uppercase tracking-wide text-gray-400 font-medium">Sexo</label>
+                            <select name="sexo"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 transition-all duration-200">
+                                <option value="Masculino" {{#usuario.sexoMasculino}}selected{{/usuario.sexoMasculino}}>Masculino</option>
+                                <option value="Femenino" {{#usuario.sexoFemenino}}selected{{/usuario.sexoFemenino}}>Femenino</option>
+                                <option value="Prefiero no cargarlo" {{#usuario.sexoOtro}}selected{{/usuario.sexoOtro}}>Prefiero no cargarlo</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="pais" class="text-xs uppercase tracking-wide text-gray-400 font-medium">País</label>
+                            <input type="text" id="pais" name="pais" value="{{usuario.pais}}"
+                                   class="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 transition-all duration-200">
+                        </div>
+                        <div>
+                            <label for="ciudad" class="text-xs uppercase tracking-wide text-gray-400 font-medium">Ciudad</label>
+                            <input type="text" id="ciudad" name="ciudad" value="{{usuario.ciudad}}"
+                                   class="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 transition-all duration-200">
+                        </div>
+                    </div>
+
+                    <div class="border-t border-gray-100 pt-6 mt-6 flex gap-3">
+                        <a href="/perfil"
+                           class="flex-1 flex items-center justify-center text-center bg-gray-100 font-bold text-lg px-10 py-3 rounded-full text-gray-700 transition-all duration-300 cursor-pointer">
+                            Cancelar
+                        </a>
+                        <button type="submit"
+                                class="flex-1 flex items-center justify-center text-center bg-[#00b582] font-bold text-lg px-10 py-3 rounded-full text-white transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg">
+                            Guardar cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {{>footer}}
+</div>
+
+<script>
+    document.getElementById('foto_perfil').addEventListener('change', (evento) => {
+        const archivo = evento.target.files[0];
+        if (!archivo) {
+            return;
+        }
+
+        const preview = document.getElementById('preview_foto');
+        preview.src = URL.createObjectURL(archivo);
+        preview.classList.remove('hidden');
+        document.getElementById('preview_placeholder').classList.add('hidden');
+    });
+</script>

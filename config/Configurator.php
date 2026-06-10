@@ -22,7 +22,7 @@ class Configurator {
     }
 
     public function getPerfilController() {
-        return new PerfilController($this->getRenderer());
+        return new PerfilController($this->getRenderer(), $this->getUsuarioModel(), new Request());
     }
 
     private function getDatabase()
