@@ -51,7 +51,8 @@ class PreguntaModel
             ? "dup.total_respuestas DESC, RAND()"
             : "RAND()";
 
-        $sql = "SELECT p.*, c.nombre AS categoria_nombre, c.color AS categoria_color
+        $sql = "SELECT p.*, c.nombre AS categoria_nombre, c.color AS categoria_color,
+                       dup.dificultad AS dificultad_usuario, dup.total_respuestas AS respuestas_usuario
                 FROM preguntas p
                 JOIN categorias c ON c.id = p.categoria_id
                 LEFT JOIN dificultad_usuario_pregunta dup
@@ -67,9 +68,12 @@ class PreguntaModel
 
     private function buscarTodas($usuarioId, $filtroExclusion)
     {
-        $sql = "SELECT p.*, c.nombre AS categoria_nombre, c.color AS categoria_color
+        $sql = "SELECT p.*, c.nombre AS categoria_nombre, c.color AS categoria_color,
+                       dup.dificultad AS dificultad_usuario, dup.total_respuestas AS respuestas_usuario
                 FROM preguntas p
                 JOIN categorias c ON c.id = p.categoria_id
+                LEFT JOIN dificultad_usuario_pregunta dup
+                    ON dup.pregunta_id = p.id AND dup.usuario_id = $usuarioId
                 WHERE p.activa = 1 AND $filtroExclusion
                 ORDER BY RAND() LIMIT 1";
 

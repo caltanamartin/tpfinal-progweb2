@@ -2,10 +2,7 @@
 <div class="min-h-screen flex flex-col pt-14">
     <div class="flex-1 flex items-center justify-center p-4">
         <div class="w-full max-w-lg">
-            <div class="flex justify-between items-center mb-4">
-                <span class="text-sm font-semibold text-gray-500">
-                    Partida #{{partida.id}}
-                </span>
+            <div class="flex justify-end items-center mb-4">
                 <span class="text-lg font-bold text-[#00b582]">
                     Puntaje: {{partida.puntaje}}
                 </span>
@@ -14,12 +11,21 @@
             <div class="rounded-2xl shadow-lg overflow-hidden"
                  style="border-top: 6px solid {{pregunta.categoria_color}};">
 
-                <div class="bg-white px-6 py-3"
+                <div class="bg-white px-6 py-3 flex items-center gap-2"
                      style="background-color: {{pregunta.categoria_color}}10;">
                     <span class="text-xs font-semibold uppercase tracking-wide"
                           style="color: {{pregunta.categoria_color}};">
                         {{pregunta.categoria_nombre}}
                     </span>
+                    {{#pregunta.esPeriodoPrueba}}
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-gray-200 text-gray-500">Periodo de prueba</span>
+                    {{/pregunta.esPeriodoPrueba}}
+                    {{^pregunta.esPeriodoPrueba}}
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{{pregunta.dificultad_label}}</span>
+                    {{/pregunta.esPeriodoPrueba}}
+                    {{#pregunta.esNeutra}}{{#pregunta.respuestas_usuario}}
+                    <span class="text-xs text-gray-400">({{pregunta.respuestas_usuario}}/5)</span>
+                    {{/pregunta.respuestas_usuario}}{{/pregunta.esNeutra}}
                 </div>
 
                 <div class="bg-white px-6 py-6">

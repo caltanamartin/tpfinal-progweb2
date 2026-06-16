@@ -73,6 +73,18 @@ class JuegoController
             ['letra' => 'D', 'texto' => $pregunta['opcion_d']],
         ];
 
+        $dif = $pregunta['dificultad_usuario'] ?? 'neutra';
+        $pregunta['esPeriodoPrueba'] = !$pregunta['dificultad_usuario'];
+        $pregunta['esNeutra'] = ($dif === 'neutra');
+        $mapa = [
+            'facil' => 'Fácil',
+            'media' => 'Media',
+            'dificil' => 'Difícil',
+            'neutra' => 'Periodo de prueba',
+        ];
+        $pregunta['dificultad_label'] = $mapa[$dif];
+        $pregunta['respuestas_usuario'] = (int)($pregunta['respuestas_usuario'] ?? 0);
+
         $data = [
             'usuario' => $usuario,
             'partida' => $partida,
