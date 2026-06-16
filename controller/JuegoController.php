@@ -51,20 +51,26 @@ class JuegoController
             Redirect::to('/juego/resultado?id=' . $partidaId);
         }
 
-        $pregunta = $this->preguntaModel->getPreguntaAleatoria($partidaId, $usuario['id']);
+        $sessionPartida = $_SESSION['partida_actual'] ?? null;
+        if ($sessionPartida && (int)$sessionPartida['partida_id'] === (int)$partidaId) {
+            $pregunta = $this->preguntaModel->getPreguntaConCategoria($sessionPartida['pregunta_id']);
+            $ordenSiguiente = $sessionPartida['orden'];
+        } else {
+            $pregunta = $this->preguntaModel->getPreguntaAleatoria($partidaId, $usuario['id']);
 
-        if (!$pregunta) {
-            $this->partidaModel->terminar($partidaId);
-            Redirect::to('/juego/resultado?id=' . $partidaId . '&fin=true');
+            if (!$pregunta) {
+                $this->partidaModel->terminar($partidaId);
+                Redirect::to('/juego/resultado?id=' . $partidaId);
+            }
+
+            $ordenSiguiente = $this->partidaPreguntaModel->siguienteOrden($partidaId);
+
+            $_SESSION['partida_actual'] = [
+                'partida_id' => $partidaId,
+                'pregunta_id' => $pregunta['id'],
+                'orden' => $ordenSiguiente,
+            ];
         }
-
-        $ordenSiguiente = $this->partidaPreguntaModel->siguienteOrden($partidaId);
-
-        $_SESSION['partida_actual'] = [
-            'partida_id' => $partidaId,
-            'pregunta_id' => $pregunta['id'],
-            'orden' => $ordenSiguiente,
-        ];
 
         $pregunta['opciones'] = [
             ['letra' => 'A', 'texto' => $pregunta['opcion_a']],
