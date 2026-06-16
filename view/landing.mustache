@@ -1,12 +1,51 @@
 {{>header}}
 <div class="h-screen overflow-hidden flex flex-col bg-gray-50">
     <div class="flex-1 flex items-center justify-center px-4">
-        <div class="text-center max-w-lg">
+        <div class="text-center max-w-lg w-full">
+            {{#usuario}}
             <div class="flex justify-center gap-4 mb-8">
                 <div class="w-14 h-14 rounded-full shadow-lg bg-[#f74114]"></div>
                 <div class="w-14 h-14 rounded-full shadow-lg bg-[#007ca6]"></div>
                 <div class="w-14 h-14 rounded-full shadow-lg bg-[#00b582]"></div>
-                <div class="w-14 h-14 rounded-full shadow-lg bg-[#ffb042]";"></div>
+                <div class="w-14 h-14 rounded-full shadow-lg bg-[#ffb042]"></div>
+            </div>
+
+            <div class="mb-8">
+                <h1 class="text-3xl sm:text-4xl font-black mb-2 text-gray-800">
+                    ¡Hola, {{usuario.nombre}}!
+                </h1>
+                <p class="text-gray-500">
+                    Puntaje total acumulado: <span class="font-bold text-[#00b582] text-xl">{{puntajeTotal}}</span>
+                </p>
+            </div>
+
+            <a href="/juego/nueva"
+               class="inline-block bg-[#00b582] font-bold text-lg px-10 py-4 rounded-full text-white transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg hover:scale-105 mb-8">
+                Nueva partida
+            </a>
+
+            {{#tienePartidas}}
+            <div class="mt-6">
+                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">Últimas partidas</h2>
+                <div class="space-y-2">
+                    {{#partidas}}
+                    <div class="bg-white rounded-xl px-4 py-3 shadow-sm flex justify-between items-center">
+                        <span class="text-sm text-gray-500">{{creado_en}}</span>
+                        <span class="text-sm font-bold {{#esGanada}}text-[#00b582]{{/esGanada}}{{^esGanada}}text-gray-700{{/esGanada}}">
+                            {{puntaje}} pts
+                        </span>
+                    </div>
+                    {{/partidas}}
+                </div>
+            </div>
+            {{/tienePartidas}}
+            {{/usuario}}
+            {{^usuario}}
+            <div class="flex justify-center gap-4 mb-8">
+                <div class="w-14 h-14 rounded-full shadow-lg bg-[#f74114]"></div>
+                <div class="w-14 h-14 rounded-full shadow-lg bg-[#007ca6]"></div>
+                <div class="w-14 h-14 rounded-full shadow-lg bg-[#00b582]"></div>
+                <div class="w-14 h-14 rounded-full shadow-lg bg-[#ffb042]"></div>
             </div>
             <h1 class="text-5xl sm:text-6xl font-black mb-4 leading-none text-gray-800">
                 Poné a prueba tu conocimiento
@@ -14,14 +53,6 @@
             <p class="text-base sm:text-lg text-gray-500 mb-10 leading-relaxed">
                 Respondé preguntas, competí contra otros y llegá a lo más alto de la tabla.
             </p>
-            {{#usuario}}
-            <p class="text-sm text-gray-400 mb-6">Bienvenido, <span class="font-semibold text-gray-700">{{usuario.username}}</span></p>
-            <a href="/vikingo"
-               class="inline-block bg-[#00b582] font-bold text-lg px-10 py-3.5 rounded-full text-white transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg hover:scale-105">
-                Ir al juego
-            </a>
-            {{/usuario}}
-            {{^usuario}}
             <a href="/login"
                class="inline-block bg-[#00b582] font-bold text-lg px-10 py-3.5 rounded-full text-white transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg hover:scale-105">
                 Empezá a jugar

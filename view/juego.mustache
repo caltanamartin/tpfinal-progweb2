@@ -1,0 +1,55 @@
+{{>header}}
+<div class="min-h-screen flex flex-col pt-14">
+    <div class="flex-1 flex items-center justify-center p-4">
+        <div class="w-full max-w-lg">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-sm font-semibold text-gray-500">
+                    Partida #{{partida.id}}
+                </span>
+                <span class="text-lg font-bold text-[#00b582]">
+                    Puntaje: {{partida.puntaje}}
+                </span>
+            </div>
+
+            <div class="rounded-2xl shadow-lg overflow-hidden"
+                 style="border-top: 6px solid {{pregunta.categoria_color}};">
+
+                <div class="bg-white px-6 py-3"
+                     style="background-color: {{pregunta.categoria_color}}10;">
+                    <span class="text-xs font-semibold uppercase tracking-wide"
+                          style="color: {{pregunta.categoria_color}};">
+                        {{pregunta.categoria_nombre}}
+                    </span>
+                </div>
+
+                <div class="bg-white px-6 py-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-6 leading-relaxed">
+                        {{pregunta.pregunta}}
+                    </h2>
+
+                    <form action="/juego/responder" method="POST" id="form-respuesta">
+                        <input type="hidden" name="partida_id" value="{{partida.id}}">
+                        <div class="space-y-3">
+                            {{#pregunta.opciones}}
+                            <button type="submit" name="respuesta" value="{{letra}}"
+                                    class="w-full text-left px-5 py-4 rounded-xl border-2 border-gray-200
+                                           hover:border-[#00b582] hover:bg-[#00b582] hover:text-white
+                                           hover:shadow-md transition-all duration-200
+                                           font-medium text-gray-700 cursor-pointer flex items-center gap-3
+                                           focus:outline-none focus:ring-2 focus:ring-[#00b582] focus:ring-offset-2">
+                                <span class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center
+                                             font-bold text-sm text-gray-500 flex-shrink-0
+                                             group-hover:bg-white/20 group-hover:text-white">
+                                    {{letra}}
+                                </span>
+                                <span>{{texto}}</span>
+                            </button>
+                            {{/pregunta.opciones}}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{>footer}}
+</div>

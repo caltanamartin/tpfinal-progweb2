@@ -14,7 +14,7 @@ class Configurator {
     }
 
     public function getHomeController() {
-        return new HomeController($this->getRenderer());
+        return new HomeController($this->getRenderer(), $this->getPartidaModel());
     }
 
     public function getAuthController() {
@@ -23,6 +23,16 @@ class Configurator {
 
     public function getPerfilController() {
         return new PerfilController($this->getRenderer(), $this->getUsuarioModel(), new Request());
+    }
+
+    public function getJuegoController() {
+        return new JuegoController(
+            $this->getRenderer(),
+            $this->getPartidaModel(),
+            $this->getPreguntaModel(),
+            $this->getPartidaPreguntaModel(),
+            new Request()
+        );
     }
 
     private function getDatabase()
@@ -48,6 +58,21 @@ class Configurator {
     private function getUsuarioModel()
     {
         return new UsuarioModel($this->getDatabase());
+    }
+
+    private function getPartidaModel()
+    {
+        return new PartidaModel($this->getDatabase());
+    }
+
+    private function getPreguntaModel()
+    {
+        return new PreguntaModel($this->getDatabase());
+    }
+
+    private function getPartidaPreguntaModel()
+    {
+        return new PartidaPreguntaModel($this->getDatabase());
     }
 
     public function getRouter()
