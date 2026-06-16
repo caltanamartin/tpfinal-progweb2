@@ -73,17 +73,23 @@ class JuegoController
             ['letra' => 'D', 'texto' => $pregunta['opcion_d']],
         ];
 
-        $dif = $pregunta['dificultad_usuario'] ?? 'neutra';
-        $pregunta['esPeriodoPrueba'] = !$pregunta['dificultad_usuario'];
-        $pregunta['esNeutra'] = ($dif === 'neutra');
-        $mapa = [
-            'facil' => 'Fácil',
-            'media' => 'Media',
-            'dificil' => 'Difícil',
-            'neutra' => 'Periodo de prueba',
-        ];
-        $pregunta['dificultad_label'] = $mapa[$dif];
-        $pregunta['respuestas_usuario'] = (int)($pregunta['respuestas_usuario'] ?? 0);
+        $totalResp = (int)$pregunta['total_respuestas_global'];
+        $totalCorr = (int)$pregunta['total_correctas_global'];
+        $pregunta['esNeutra'] = ($totalResp < 10);
+        $pregunta['respuestas_global'] = $totalResp;
+
+        if ($totalResp >= 10) {
+            $ratio = $totalCorr / $totalResp;
+            if ($ratio > 0.7) {
+                $pregunta['dificultad_label'] = 'Fácil';
+            } elseif ($ratio < 0.3) {
+                $pregunta['dificultad_label'] = 'Difícil';
+            } else {
+                $pregunta['dificultad_label'] = 'Media';
+            }
+        } else {
+            $pregunta['dificultad_label'] = 'Periodo de prueba';
+        }
 
         $data = [
             'usuario' => $usuario,
@@ -123,7 +129,6 @@ class JuegoController
         $esCorrecta = ($respuesta === $pregunta['respuesta_correcta']) ? 1 : 0;
 
         $this->partidaPreguntaModel->registrar($partidaId, $preguntaId, $respuesta, $esCorrecta, $orden);
-        $this->preguntaModel->actualizarDificultad($preguntaId, $usuario['id'], $esCorrecta);
         unset($_SESSION['partida_actual']);
 
         if ($esCorrecta) {

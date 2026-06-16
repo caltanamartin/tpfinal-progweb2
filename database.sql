@@ -102,14 +102,3 @@ INSERT INTO aldea_vikinga.preguntas (categoria_id, pregunta, opcion_a, opcion_b,
 (5, '¿Cuál es el río más largo del mundo?', 'Amazonas', 'Nilo', 'Misisipi', 'Yangtsé', 'B'),
 (5, '¿Cuál es la capital de Australia?', 'Sídney', 'Melbourne', 'Canberra', 'Brisbane', 'C'),
 (5, '¿En qué continente está el desierto del Sahara?', 'Asia', 'África', 'América', 'Oceanía', 'B');
-
-CREATE TABLE aldea_vikinga.dificultad_usuario_pregunta (
-    usuario_id INT NOT NULL,
-    pregunta_id INT NOT NULL,
-    dificultad ENUM('facil','media','dificil','neutra') DEFAULT 'neutra',
-    total_respuestas INT DEFAULT 0,
-    total_correctas INT DEFAULT 0,
-    PRIMARY KEY (usuario_id, pregunta_id),
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
-    FOREIGN KEY (pregunta_id) REFERENCES preguntas(id)
-);

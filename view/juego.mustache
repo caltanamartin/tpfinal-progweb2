@@ -17,15 +17,12 @@
                           style="color: {{pregunta.categoria_color}};">
                         {{pregunta.categoria_nombre}}
                     </span>
-                    {{#pregunta.esPeriodoPrueba}}
-                    <span class="text-xs px-2 py-0.5 rounded-full bg-gray-200 text-gray-500">Periodo de prueba</span>
-                    {{/pregunta.esPeriodoPrueba}}
-                    {{^pregunta.esPeriodoPrueba}}
+                    {{#pregunta.esNeutra}}
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-gray-200 text-gray-500">Periodo de prueba{{#pregunta.respuestas_global}} ({{pregunta.respuestas_global}}/10){{/pregunta.respuestas_global}}</span>
+                    {{/pregunta.esNeutra}}
+                    {{^pregunta.esNeutra}}
                     <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{{pregunta.dificultad_label}}</span>
-                    {{/pregunta.esPeriodoPrueba}}
-                    {{#pregunta.esNeutra}}{{#pregunta.respuestas_usuario}}
-                    <span class="text-xs text-gray-400">({{pregunta.respuestas_usuario}}/5)</span>
-                    {{/pregunta.respuestas_usuario}}{{/pregunta.esNeutra}}
+                    {{/pregunta.esNeutra}}
                 </div>
 
                 <div class="bg-white px-6 py-6">
