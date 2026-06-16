@@ -14,7 +14,7 @@ class Configurator {
     }
 
     public function getHomeController() {
-        return new HomeController($this->getRenderer(), $this->getPartidaModel());
+        return new HomeController($this->getRenderer(), $this->getPartidaModel(), $this->getPreguntaModel());
     }
 
     public function getAuthController() {

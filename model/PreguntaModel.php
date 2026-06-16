@@ -95,7 +95,7 @@ class PreguntaModel
         }
     }
 
-    private function calcularNivelUsuario($usuarioId)
+    public function calcularNivelUsuario($usuarioId)
     {
         $sql = "SELECT COUNT(*) AS total,
                        IFNULL(SUM(es_correcta), 0) AS correctas
