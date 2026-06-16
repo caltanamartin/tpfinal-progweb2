@@ -16,11 +16,13 @@ class PerfilController
     public function ver()
     {
         $usuario = $_SESSION['usuario'] ?? null;
-
+        
         if (!$usuario) {
             Redirect::to('/login');
         }
 
+        $usuario = $this->model->getUsuarioConEstadisticas($usuario['id']);
+        
         $this->renderer->render("perfil", [
             "usuario" => $usuario,
             "esPerfil" => true,

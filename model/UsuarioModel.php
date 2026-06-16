@@ -16,6 +16,19 @@ class UsuarioModel
         return !empty($result) ? $result[0] : null;
     }
 
+    public function getUsuarioConEstadisticas($id)
+    {
+        $sql = "SELECT u.*,
+                   COALESCE(SUM(p.puntaje), 0) AS puntaje_total,
+                   COUNT(p.id) AS cantidad_partidas
+            FROM usuarios u
+            LEFT JOIN partidas p ON p.usuario_id = u.id AND p.estado = 'terminada'
+            WHERE u.id = $id
+            GROUP BY u.id";
+        $result = $this->database->query($sql);
+        return $result[0] ?? null;
+    }
+
     public function getByEmail($email)
     {
         $sql = "SELECT * FROM usuarios WHERE email = '$email'";
