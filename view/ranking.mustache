@@ -8,14 +8,14 @@
         {{/usuarios}}
 
         {{#usuarios}}
-        <div class="flex items-center gap-4 bg-white rounded-xl px-5 py-4 mb-3 border border-gray-200 shadow-sm">
+        <a href="/perfil/{{id}}" class="flex items-center gap-4 bg-white rounded-xl px-5 py-4 mb-3 border border-gray-200 shadow-sm hover:border-[#00b582] hover:shadow-md transition-all duration-200">
             <span class="text-lg font-bold text-gray-400 w-8 text-center">{{posicion}}</span>
-            <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
+            <div class="w-10 h-10 rounded-full bg-gray-100 overflow-hidden flex-shrink-0 border-2 border-gray-200">
                 {{#foto_perfil}}
                 <img src="/{{foto_perfil}}" alt="{{nombre}}" class="w-full h-full object-cover">
                 {{/foto_perfil}}
                 {{^foto_perfil}}
-                <div class="w-full h-full flex items-center justify-center text-gray-500 font-bold text-lg bg-gray-300"></div>
+                <img src="/uploads/foto-default.svg" alt="Sin foto" class="w-full h-full object-cover p-2">
                 {{/foto_perfil}}
             </div>
             <div class="flex-1 min-w-0">
@@ -26,7 +26,7 @@
                 <p class="font-bold text-lg text-[#00b582]">{{puntaje_total}} pts</p>
                 <p class="text-xs text-gray-400">{{cantidad_partidas}} partidas</p>
             </div>
-        </div>
+        </a>
         {{/usuarios}}
 
         {{#usuario}}

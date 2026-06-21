@@ -9,19 +9,20 @@
                          class="w-24 h-24 rounded-full object-cover border-4 border-[#00b582] shadow-md mb-4">
                     {{/usuario.foto_perfil}}
                     {{^usuario.foto_perfil}}
-                    <div class="w-24 h-24 rounded-full bg-[#00b582] flex items-center justify-center text-white text-3xl font-bold shadow-md mb-4">
-                        {{usuario.nombre.0}}
-                    </div>
+                    <img src="/uploads/foto-default.svg" alt="Foto de perfil"
+                         class="w-24 h-24 rounded-full border-4 border-gray-200 bg-gray-100 mb-4">
                     {{/usuario.foto_perfil}}
                     <h2 class="text-xl font-bold text-gray-800">{{usuario.username}}</h2>
                     <p class="text-sm text-gray-500">{{usuario.nombre}}</p>
                 </div>
 
                 <div class="border-t border-gray-100 pt-6 space-y-4">
+                    {{#esPropio}}
                     <div>
                         <p class="text-xs uppercase tracking-wide text-gray-400 font-medium">Email</p>
                         <p class="text-sm text-gray-700">{{usuario.email}}</p>
                     </div>
+                    {{/esPropio}}
                     <div>
                         <p class="text-xs uppercase tracking-wide text-gray-400 font-medium">Fecha de nacimiento</p>
                         <p class="text-sm text-gray-700">{{usuario.anio_nacimiento}}</p>
@@ -52,10 +53,15 @@
                 </div>
 
                 <div class="border-t border-gray-100 pt-6 mt-6">
+                    {{#esPropio}}
                     <a href="/perfil/editar"
                        class="block text-center w-full bg-[#00b582] font-bold text-lg px-10 py-3 rounded-full text-white transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg">
                         Editar perfil
                     </a>
+                    {{/esPropio}}
+                    {{^esPropio}}
+                    <a href="/ranking" class="block text-center text-sm font-medium text-[#007ca6] hover:underline">Volver al ranking</a>
+                    {{/esPropio}}
                 </div>
             </div>
         </div>

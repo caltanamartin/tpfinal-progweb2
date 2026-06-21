@@ -26,6 +26,7 @@ class PerfilController
         $this->renderer->render("perfil", [
             "usuario" => $usuario,
             "esPerfil" => true,
+            "esPropio" => true,
         ]);
     }
 
@@ -78,6 +79,28 @@ class PerfilController
         $this->renderer->render("formEditarPerfilView", [
             "usuario" => $usuario,
             "esPerfil" => true,
+        ]);
+    }
+
+    public function verPublico()
+    {
+        $id = $this->request->get('id');
+        $usuario = $this->model->getUsuarioConEstadisticas($id);
+
+        if (!$usuario) {
+            Redirect::to('/ranking');
+        }
+
+        $esPropio = isset($_SESSION['usuario']) && $_SESSION['usuario']['id'] == $id;
+
+        if ($esPropio) {
+            Redirect::to('/perfil');
+        }
+
+        $this->renderer->render("perfil", [
+            "usuario" => $usuario,
+            "esPerfil" => true,
+            "esPropio" => $esPropio,
         ]);
     }
 }

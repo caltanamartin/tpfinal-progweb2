@@ -5,6 +5,7 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^login$              index.php?controller=auth&method=verLogin [L,QSA]
 RewriteRule ^registro$           index.php?controller=auth&method=verRegistro [L,QSA]
 RewriteRule ^logout$             index.php?controller=auth&method=logout [L,QSA]
+RewriteRule ^perfil/(\d+)$       index.php?controller=perfil&method=verPublico&id=$1 [L,QSA]
 RewriteRule ^perfil$             index.php?controller=perfil&method=ver [L,QSA]
 RewriteRule ^perfil/editar$      index.php?controller=perfil&method=editarPerfil [L,QSA]
 
