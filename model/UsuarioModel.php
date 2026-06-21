@@ -43,6 +43,25 @@ class UsuarioModel
         return $this->database->execute($sql);
     }
 
+    public function saveToken($id, $token)
+    {
+        $sql = "UPDATE usuarios SET token_verificacion = '$token' WHERE id = $id";
+        return $this->database->execute($sql);
+    }
+
+    public function findByToken($token)
+    {
+        $sql = "SELECT * FROM usuarios WHERE token_verificacion = '$token'";
+        $result = $this->database->query($sql);
+        return $result[0] ?? null;
+    }
+
+    public function setVerificado($id)
+    {
+        $sql = "UPDATE usuarios SET verificado = 1, token_verificacion = NULL WHERE id = $id";
+        return $this->database->execute($sql);
+    }
+
     public function actualizar($username, $cambios)
     {
         if (empty($cambios)) {

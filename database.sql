@@ -23,8 +23,10 @@ create table aldea_vikinga.usuarios
     sexo           enum('Masculino','Femenino','Prefiero no cargarlo') default 'Prefiero no cargarlo',
     pais           varchar(100)                           default '',
     ciudad         varchar(100)                           default '',
-    foto_perfil    varchar(255)                           default null,
-    creado_en      timestamp default current_timestamp() not null,
+    foto_perfil       varchar(255)                           default null,
+    verificado        tinyint(1)                             default 0,
+    token_verificacion varchar(64)                            default null,
+    creado_en         timestamp default current_timestamp() not null,
     unique (email),
     unique (username)
 );

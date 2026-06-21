@@ -22,6 +22,11 @@ class AuthController
             unset($_SESSION['exito']);
         }
 
+        if (isset($_SESSION['verificacion_exito'])) {
+            $data['exito'] = $_SESSION['verificacion_exito'];
+            unset($_SESSION['verificacion_exito']);
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $username = $this->request->post('username');
             $password = $this->request->post('password');
@@ -29,11 +34,15 @@ class AuthController
             $usuario = $this->model->getByUsername($username);
 
             if ($usuario && $password === $usuario['password']) {
-                $_SESSION['usuario'] = $usuario;
-                Redirect::to('/');
+                if (!$usuario['verificado']) {
+                    $data['error'] = "Tenés que verificar tu cuenta por email antes de iniciar sesión.";
+                } else {
+                    $_SESSION['usuario'] = $usuario;
+                    Redirect::to('/');
+                }
+            } else {
+                $data['error'] = "Usuario o contraseña incorrectos.";
             }
-
-            $data['error'] = "Usuario o contraseña incorrectos.";
         }
 
         $this->renderer->render("formLoginView", $data);
@@ -72,12 +81,43 @@ class AuthController
                 }
 
                 $this->model->crear($email, $nombre, $username, $password, $anioNacimiento, $sexo, $pais, $ciudad, $fotoPerfil);
-                $_SESSION['exito'] = "Usuario registrado correctamente. Iniciá sesión.";
+                $usuario = $this->model->getByUsername($username);
+                $token = bin2hex(random_bytes(32));
+                $this->model->saveToken($usuario['id'], $token);
+
+                $baseUrl = (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'];
+                $link = $baseUrl . '/verificar/' . $token;
+
+                $subject = "Verificá tu cuenta en PreguntaTres";
+                $body = "<h1>Bienvenido a PreguntaTres</h1>
+                         <p>Hacé clic en el siguiente enlace para verificar tu cuenta:</p>
+                         <p><a href=\"$link\">$link</a></p>
+                         <p>Si no te registraste, ignorá este mensaje.</p>";
+
+                Mailer::send($email, $subject, $body);
+
+                $_SESSION['exito'] = "Registrado correctamente. Revisá tu email para verificar la cuenta.";
                 Redirect::to('/login');
             }
         }
 
         $this->renderer->render("formRegistrationView", $data);
+    }
+
+    public function verificar()
+    {
+        $token = $this->request->get('token');
+        $usuario = $this->model->findByToken($token);
+
+        if (!$usuario) {
+            $data['error'] = "El enlace de verificación no es válido o ya expiró.";
+            $this->renderer->render("formLoginView", $data);
+            return;
+        }
+
+        $this->model->setVerificado($usuario['id']);
+        $_SESSION['verificacion_exito'] = "Cuenta verificada correctamente. Ya podés iniciar sesión.";
+        Redirect::to('/login');
     }
 
     public function logout()

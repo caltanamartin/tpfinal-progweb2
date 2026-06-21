@@ -20,4 +20,6 @@ RewriteRule ^juego/responder$    index.php?controller=juego&method=responder [L,
 RewriteRule ^juego/resultado$    index.php?controller=juego&method=resultado [L,QSA]
 RewriteRule ^juego$              index.php?controller=juego&method=jugar [L,QSA]
 
+RewriteRule ^verificar/(.+)$     index.php?controller=auth&method=verificar&token=$1 [L,QSA]
+
 RewriteRule ^$                   index.php?controller=home&method=ver [L,QSA]
