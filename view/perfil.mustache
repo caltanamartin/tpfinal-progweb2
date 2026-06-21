@@ -52,6 +52,14 @@
                     </div>
                 </div>
 
+                {{#usuario.pais}}
+                <div class="border-t border-gray-100 pt-6 mt-6">
+                    <p class="text-xs uppercase tracking-wide text-gray-400 font-medium mb-3">Ubicación</p>
+                    <div id="mapa" class="w-full rounded-xl overflow-hidden border border-gray-200" style="height: 200px;"
+                         data-label="{{usuario.ciudad}}, {{usuario.pais}}"></div>
+                </div>
+                {{/usuario.pais}}
+
                 <div class="border-t border-gray-100 pt-6 mt-6">
                     {{#esPropio}}
                     <a href="/perfil/editar"
@@ -66,5 +74,35 @@
             </div>
         </div>
     </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var mapaDiv = document.getElementById('mapa');
+        if (!mapaDiv) return;
+
+        function initMap(lat, lng, label) {
+            var map = L.map('mapa', { zoomControl: false }).setView([lat, lng], 12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
+            L.marker([lat, lng]).addTo(map).bindPopup(label);
+        }
+
+        var ubi = encodeURIComponent(mapaDiv.dataset.label);
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'https://nominatim.openstreetmap.org/search?q=' + ubi + '&format=json&limit=1', true);
+        xhr.send();
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var data = JSON.parse(xhr.responseText);
+                if (data.length > 0) {
+                    initMap(parseFloat(data[0].lat), parseFloat(data[0].lon), mapaDiv.dataset.label);
+                } else {
+                    mapaDiv.innerHTML = '<p class="text-sm text-gray-400 text-center py-8">Ubicación no encontrada</p>';
+                }
+            }
+        };
+    });
+    </script>
     {{>footer}}
 </div>
