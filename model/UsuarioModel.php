@@ -62,6 +62,19 @@ class UsuarioModel
         return $this->database->execute($sql);
     }
 
+    public function getRanking($limite = 50)
+    {
+        $sql = "SELECT u.id, u.username, u.nombre, u.foto_perfil,
+                       IFNULL(SUM(p.puntaje), 0) AS puntaje_total,
+                       COUNT(p.id) AS cantidad_partidas
+                FROM usuarios u
+                LEFT JOIN partidas p ON p.usuario_id = u.id AND p.estado = 'terminada'
+                GROUP BY u.id
+                ORDER BY puntaje_total DESC
+                LIMIT $limite";
+        return $this->database->query($sql);
+    }
+
     public function actualizar($username, $cambios)
     {
         if (empty($cambios)) {

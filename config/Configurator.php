@@ -17,6 +17,10 @@ class Configurator {
         return new HomeController($this->getRenderer(), $this->getPartidaModel(), $this->getPreguntaModel());
     }
 
+    public function getRankingController() {
+        return new RankingController($this->getRenderer(), $this->getUsuarioModel());
+    }
+
     public function getAuthController() {
         return new AuthController($this->getRenderer(), $this->getUsuarioModel(), new Request());
     }
