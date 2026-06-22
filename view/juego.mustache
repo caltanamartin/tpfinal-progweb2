@@ -2,7 +2,14 @@
 <div class="min-h-screen flex flex-col pt-14">
     <div class="flex-1 flex items-center justify-center p-4">
         <div class="w-full max-w-lg">
-            <div class="flex justify-end items-center mb-4">
+            <div class="flex justify-between items-center mb-4">
+                <span id="timer" class="text-lg font-bold text-gray-600 flex items-center gap-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span id="timer-segundos">30</span>s
+                </span>
                 <span class="text-lg font-bold text-[#00b582]">
                     Puntaje: {{partida.puntaje}}
                 </span>
@@ -56,3 +63,28 @@
     </div>
     {{>footer}}
 </div>
+
+<script>
+    (function() {
+        var segundos = 30;
+        var span = document.getElementById('timer-segundos');
+        var timerEl = document.getElementById('timer');
+
+        if (!span || !timerEl) return;
+
+        var intervalo = setInterval(function() {
+            segundos--;
+            span.textContent = segundos;
+
+            if (segundos <= 10) {
+                timerEl.classList.remove('text-gray-600');
+                timerEl.classList.add('text-red-500');
+            }
+
+            if (segundos <= 0) {
+                clearInterval(intervalo);
+                window.location.href = '/juego/tiempo';
+            }
+        }, 1000);
+    })();
+</script>

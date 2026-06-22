@@ -95,6 +95,9 @@ class JuegoController
         if ($sessionPartida && (int)$sessionPartida['partida_id'] === (int)$partidaId) {
             $pregunta = $this->preguntaModel->getPreguntaConCategoria($sessionPartida['pregunta_id']);
             $ordenSiguiente = $sessionPartida['orden'];
+            if (!isset($sessionPartida['mostrada_en'])) {
+                $_SESSION['partida_actual']['mostrada_en'] = time();
+            }
         } else {
             $categoriaId = $_SESSION['categoria_elegida'] ?? null;
             unset($_SESSION['categoria_elegida']);
@@ -116,6 +119,7 @@ class JuegoController
                 'partida_id' => $partidaId,
                 'pregunta_id' => $pregunta['id'],
                 'orden' => $ordenSiguiente,
+                'mostrada_en' => time(),
             ];
         }
 
@@ -173,9 +177,34 @@ class JuegoController
         $orden = $sessionPartida['orden'];
 
         $partida = $this->partidaModel->obtener($partidaId);
-        if (!$partida || $partida['usuario_id'] != $usuario['id'] || $partida['estado'] === 'terminada') {
+        if (!$partida || $partida['usuario_id'] != $usuario['id']) {
             unset($_SESSION['partida_actual']);
             Redirect::to('/');
+        }
+
+        if ($partida['estado'] === 'terminada') {
+            unset($_SESSION['partida_actual']);
+            Redirect::to('/juego/resultado?id=' . $partidaId);
+        }
+
+        $mostradaEn = $sessionPartida['mostrada_en'] ?? 0;
+        if (time() - $mostradaEn > 30) {
+            $pregunta = $this->preguntaModel->getPreguntaConCategoria($preguntaId);
+            $this->partidaPreguntaModel->registrar($partidaId, $preguntaId, null, 0, $orden);
+            $this->partidaModel->terminar($partidaId);
+            unset($_SESSION['partida_actual']);
+            $_SESSION['ultima_respuesta'] = [
+                'pregunta' => $pregunta['pregunta'],
+                'respuesta_correcta' => $pregunta['respuesta_correcta'],
+                'opciones' => [
+                    'A' => $pregunta['opcion_a'],
+                    'B' => $pregunta['opcion_b'],
+                    'C' => $pregunta['opcion_c'],
+                    'D' => $pregunta['opcion_d'],
+                ],
+            ];
+            $_SESSION['hubo_timeout'] = true;
+            Redirect::to('/juego/resultado?id=' . $partidaId);
         }
 
         $pregunta = $this->preguntaModel->getPreguntaConCategoria($preguntaId);
@@ -203,6 +232,52 @@ class JuegoController
         }
     }
 
+    public function tiempoAgotado()
+    {
+        $usuario = $_SESSION['usuario'] ?? null;
+        if (!$usuario) {
+            Redirect::to('/login');
+        }
+
+        $sessionPartida = $_SESSION['partida_actual'] ?? null;
+        if (!$sessionPartida) {
+            Redirect::to('/');
+        }
+
+        $partidaId = $sessionPartida['partida_id'];
+        $preguntaId = $sessionPartida['pregunta_id'];
+        $orden = $sessionPartida['orden'];
+
+        $partida = $this->partidaModel->obtener($partidaId);
+        if (!$partida || $partida['usuario_id'] != $usuario['id']) {
+            unset($_SESSION['partida_actual']);
+            Redirect::to('/');
+        }
+
+        if ($partida['estado'] === 'terminada') {
+            unset($_SESSION['partida_actual']);
+            Redirect::to('/juego/resultado?id=' . $partidaId);
+        }
+
+        $pregunta = $this->preguntaModel->getPreguntaConCategoria($preguntaId);
+        $this->partidaPreguntaModel->registrar($partidaId, $preguntaId, null, 0, $orden);
+        $this->partidaModel->terminar($partidaId);
+        unset($_SESSION['partida_actual']);
+
+        $_SESSION['ultima_respuesta'] = [
+            'pregunta' => $pregunta['pregunta'],
+            'respuesta_correcta' => $pregunta['respuesta_correcta'],
+            'opciones' => [
+                'A' => $pregunta['opcion_a'],
+                'B' => $pregunta['opcion_b'],
+                'C' => $pregunta['opcion_c'],
+                'D' => $pregunta['opcion_d'],
+            ],
+        ];
+        $_SESSION['hubo_timeout'] = true;
+        Redirect::to('/juego/resultado?id=' . $partidaId);
+    }
+
     public function resultado()
     {
         $usuario = $_SESSION['usuario'] ?? null;
@@ -217,7 +292,15 @@ class JuegoController
             Redirect::to('/');
         }
 
-        $ultimaRespuesta = $this->partidaPreguntaModel->obtenerUltimaRespuesta($partidaId);
+        $huboTimeout = $_SESSION['hubo_timeout'] ?? false;
+        unset($_SESSION['hubo_timeout']);
+
+        if ($huboTimeout) {
+            $ultimaRespuesta = $this->partidaPreguntaModel->obtenerUltimaRespuestaDePartida($partidaId);
+        } else {
+            $ultimaRespuesta = $this->partidaPreguntaModel->obtenerUltimaRespuesta($partidaId);
+        }
+
         $ultimaData = $_SESSION['ultima_respuesta'] ?? null;
         unset($_SESSION['ultima_respuesta']);
 
@@ -226,6 +309,7 @@ class JuegoController
             'partida' => $partida,
             'ultimaPregunta' => $ultimaData,
             'huboError' => !$ultimaRespuesta || !$ultimaRespuesta['es_correcta'],
+            'huboTimeout' => $huboTimeout,
             'esResultado' => true,
         ];
 
