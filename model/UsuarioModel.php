@@ -69,6 +69,7 @@ class UsuarioModel
                        COUNT(p.id) AS cantidad_partidas
                 FROM usuarios u
                 LEFT JOIN partidas p ON p.usuario_id = u.id AND p.estado = 'terminada'
+                WHERE u.verificado = 1
                 GROUP BY u.id
                 ORDER BY puntaje_total DESC
                 LIMIT $limite";
