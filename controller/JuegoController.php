@@ -295,11 +295,7 @@ class JuegoController
         $huboTimeout = $_SESSION['hubo_timeout'] ?? false;
         unset($_SESSION['hubo_timeout']);
 
-        if ($huboTimeout) {
-            $ultimaRespuesta = $this->partidaPreguntaModel->obtenerUltimaRespuestaDePartida($partidaId);
-        } else {
-            $ultimaRespuesta = $this->partidaPreguntaModel->obtenerUltimaRespuesta($partidaId);
-        }
+        $ultimaRespuesta = $this->partidaPreguntaModel->obtenerUltimaRespuesta($partidaId);
 
         $ultimaData = $_SESSION['ultima_respuesta'] ?? null;
         unset($_SESSION['ultima_respuesta']);
