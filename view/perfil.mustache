@@ -81,10 +81,8 @@
         if (!mapaDiv) return;
 
         function initMap(lat, lng, label) {
-            var map = L.map('mapa', { zoomControl: false }).setView([lat, lng], 12);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap'
-            }).addTo(map);
+            var map = L.map('mapa', { zoomControl: false }).setView([lat, lng], 6);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
             L.marker([lat, lng]).addTo(map).bindPopup(label);
         }
 
