@@ -30,7 +30,47 @@ class JuegoController
         }
 
         $partidaId = $this->partidaModel->crear($usuario['id']);
-        Redirect::to('/juego?id=' . $partidaId);
+        Redirect::to('/juego/categoria?id=' . $partidaId);
+    }
+
+    public function categoria()
+    {
+        $usuario = $_SESSION['usuario'] ?? null;
+        if (!$usuario) {
+            Redirect::to('/login');
+        }
+
+        $partidaId = $_REQUEST['id'] ?? null;
+        $partida = $this->partidaModel->obtener($partidaId);
+
+        if (!$partida || $partida['usuario_id'] != $usuario['id']) {
+            Redirect::to('/');
+        }
+
+        if ($partida['estado'] === 'terminada') {
+            Redirect::to('/juego/resultado?id=' . $partidaId);
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $categoriaId = $this->request->post('categoria_id');
+            $_SESSION['categoria_elegida'] = $categoriaId;
+            Redirect::to('/juego?id=' . $partidaId);
+        }
+
+        $categorias = $this->preguntaModel->getCategorias();
+
+        $data = [
+            'usuario' => $usuario,
+            'partida' => $partida,
+            'categorias' => $categorias,
+        ];
+
+        if (isset($_SESSION['error_categoria'])) {
+            $data['error'] = $_SESSION['error_categoria'];
+            unset($_SESSION['error_categoria']);
+        }
+
+        $this->renderer->render('categoria', $data);
     }
 
     public function jugar()
@@ -56,11 +96,18 @@ class JuegoController
             $pregunta = $this->preguntaModel->getPreguntaConCategoria($sessionPartida['pregunta_id']);
             $ordenSiguiente = $sessionPartida['orden'];
         } else {
-            $pregunta = $this->preguntaModel->getPreguntaAleatoria($partidaId, $usuario['id']);
+            $categoriaId = $_SESSION['categoria_elegida'] ?? null;
+            unset($_SESSION['categoria_elegida']);
+
+            if (!$categoriaId) {
+                Redirect::to('/juego/categoria?id=' . $partidaId);
+            }
+
+            $pregunta = $this->preguntaModel->getPreguntaAleatoria($partidaId, $usuario['id'], $categoriaId);
 
             if (!$pregunta) {
-                $this->partidaModel->terminar($partidaId);
-                Redirect::to('/juego/resultado?id=' . $partidaId);
+                $_SESSION['error_categoria'] = 'No hay más preguntas de esta categoría. Elegí otra.';
+                Redirect::to('/juego/categoria?id=' . $partidaId);
             }
 
             $ordenSiguiente = $this->partidaPreguntaModel->siguienteOrden($partidaId);
@@ -139,7 +186,7 @@ class JuegoController
 
         if ($esCorrecta) {
             $this->partidaModel->sumarPunto($partidaId);
-            Redirect::to('/juego?id=' . $partidaId);
+            Redirect::to('/juego/categoria?id=' . $partidaId);
         } else {
             $this->partidaModel->terminar($partidaId);
             $_SESSION['ultima_respuesta'] = [

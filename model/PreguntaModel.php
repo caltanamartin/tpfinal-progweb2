@@ -10,7 +10,7 @@ class PreguntaModel
         $this->database = $database;
     }
 
-    public function getPreguntaAleatoria($partidaId, $usuarioId)
+    public function getPreguntaAleatoria($partidaId, $usuarioId, $categoriaId = null)
     {
         $nivelUsuario = $this->calcularNivelUsuario($usuarioId);
         $distribucion = $this->obtenerDistribucion($nivelUsuario);
@@ -26,17 +26,18 @@ class PreguntaModel
 
         $idsEnPartida = $this->obtenerIdsVistosEnPartida($partidaId);
         $filtroExcluir = !empty($idsEnPartida) ? "p.id NOT IN (" . implode(',', $idsEnPartida) . ")" : "1=1";
+        $filtroCategoria = $categoriaId ? "AND p.categoria_id = $categoriaId" : "";
 
-        $pregunta = $this->buscarPorDificultad($dificultadElegida, $filtroExcluir);
+        $pregunta = $this->buscarPorDificultad($dificultadElegida, $filtroExcluir, $filtroCategoria);
         if ($pregunta) return $pregunta;
 
-        $pregunta = $this->buscarPorDificultad('neutra', $filtroExcluir);
+        $pregunta = $this->buscarPorDificultad('neutra', $filtroExcluir, $filtroCategoria);
         if ($pregunta) return $pregunta;
 
-        return $this->buscarTodas($filtroExcluir);
+        return $this->buscarTodas($filtroExcluir, $filtroCategoria);
     }
 
-    private function buscarPorDificultad($dificultad, $filtroExclusion)
+    private function buscarPorDificultad($dificultad, $filtroExclusion, $filtroCategoria = '')
     {
         $order = ($dificultad === 'neutra')
             ? "total_respuestas_global DESC, RAND()"
@@ -58,7 +59,7 @@ class PreguntaModel
                 FROM preguntas p
                 JOIN categorias c ON c.id = p.categoria_id
                 LEFT JOIN partidas_preguntas pp ON pp.pregunta_id = p.id
-                WHERE p.activa = 1 AND $filtroExclusion
+                WHERE p.activa = 1 AND $filtroExclusion $filtroCategoria
                 GROUP BY p.id
                 HAVING $having
                 ORDER BY $order
@@ -68,7 +69,7 @@ class PreguntaModel
         return !empty($result) ? $result[0] : null;
     }
 
-    private function buscarTodas($filtroExclusion)
+    private function buscarTodas($filtroExclusion, $filtroCategoria = '')
     {
         $sql = "SELECT p.*, c.nombre AS categoria_nombre, c.color AS categoria_color,
                        COUNT(pp.id) AS total_respuestas_global,
@@ -76,7 +77,7 @@ class PreguntaModel
                 FROM preguntas p
                 JOIN categorias c ON c.id = p.categoria_id
                 LEFT JOIN partidas_preguntas pp ON pp.pregunta_id = p.id
-                WHERE p.activa = 1 AND $filtroExclusion
+                WHERE p.activa = 1 AND $filtroExclusion $filtroCategoria
                 GROUP BY p.id
                 ORDER BY RAND() LIMIT 1";
 

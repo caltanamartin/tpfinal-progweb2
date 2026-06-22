@@ -17,6 +17,7 @@ RewriteRule ^vikingo/procesarEditar$ index.php?controller=vikingo&method=procesa
 RewriteRule ^vikingo$            index.php?controller=vikingo&method=ver [L,QSA]
 
 RewriteRule ^juego/nueva$        index.php?controller=juego&method=nuevaPartida [L,QSA]
+RewriteRule ^juego/categoria$    index.php?controller=juego&method=categoria [L,QSA]
 RewriteRule ^juego/responder$    index.php?controller=juego&method=responder [L,QSA]
 RewriteRule ^juego/resultado$    index.php?controller=juego&method=resultado [L,QSA]
 RewriteRule ^juego$              index.php?controller=juego&method=jugar [L,QSA]
