@@ -22,11 +22,13 @@ class PerfilController
         }
 
         $usuario = $this->model->getUsuarioConEstadisticas($usuario['id']);
+        $qrUrl = $this->buildQrUrl($usuario['id']);
         
         $this->renderer->render("perfil", [
             "usuario" => $usuario,
             "esPerfil" => true,
             "esPropio" => true,
+            "qrUrl" => $qrUrl,
         ]);
     }
 
@@ -82,6 +84,12 @@ class PerfilController
         ]);
     }
 
+    private function buildQrUrl($userId)
+    {
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+        return $protocol . $_SERVER['HTTP_HOST'] . '/perfil/' . $userId;
+    }
+
     public function verPublico()
     {
         $id = $this->request->get('id');
@@ -97,10 +105,13 @@ class PerfilController
             Redirect::to('/perfil');
         }
 
+        $qrUrl = $this->buildQrUrl($usuario['id']);
+
         $this->renderer->render("perfil", [
             "usuario" => $usuario,
             "esPerfil" => true,
             "esPropio" => $esPropio,
+            "qrUrl" => $qrUrl,
         ]);
     }
 }
