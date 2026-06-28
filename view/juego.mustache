@@ -8,7 +8,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    <span id="timer-segundos">30</span>s
+                    <span id="timer-segundos">{{tiempo_restante}}</span>s
                 </span>
                 <span class="text-lg font-bold text-[#00b582]">
                     Puntaje: {{partida.puntaje}}
@@ -66,7 +66,7 @@
 
 <script>
     (function() {
-        var segundos = 30;
+        var segundos = {{tiempo_restante}};
         var span = document.getElementById('timer-segundos');
         var timerEl = document.getElementById('timer');
 

@@ -123,6 +123,9 @@ class JuegoController
             ];
         }
 
+        $mostradaEn = $_SESSION['partida_actual']['mostrada_en'];
+        $tiempoRestante = max(0, 30 - (time() - $mostradaEn));
+
         $pregunta['opciones'] = [
             ['letra' => 'A', 'texto' => $pregunta['opcion_a']],
             ['letra' => 'B', 'texto' => $pregunta['opcion_b']],
@@ -153,6 +156,7 @@ class JuegoController
             'partida' => $partida,
             'pregunta' => $pregunta,
             'esJuego' => true,
+            'tiempo_restante' => $tiempoRestante,
         ];
 
         $this->renderer->render('juego', $data);
@@ -257,6 +261,11 @@ class JuegoController
         if ($partida['estado'] === 'terminada') {
             unset($_SESSION['partida_actual']);
             Redirect::to('/juego/resultado?id=' . $partidaId);
+        }
+
+        $mostradaEn = $sessionPartida['mostrada_en'] ?? 0;
+        if (time() - $mostradaEn < 30) {
+            Redirect::to('/juego?id=' . $partidaId);
         }
 
         $pregunta = $this->preguntaModel->getPreguntaConCategoria($preguntaId);
