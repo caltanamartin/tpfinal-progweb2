@@ -2,5 +2,49 @@
     <p class="text-xs text-gray-400">© 2026 PreguntaTres. Todos los derechos reservados.</p>
 </footer>
 
+<script>
+(function() {
+    var audio = document.getElementById('bgm');
+    var btn = document.getElementById('btn-music');
+    var iconOn = document.getElementById('icon-music-on');
+    var iconOff = document.getElementById('icon-music-off');
+    if (!audio || !btn || !iconOn || !iconOff) return;
+
+    var isMuted = localStorage.getItem('bgm_muted') === 'true';
+    audio.muted = isMuted;
+    iconOn.classList.toggle('hidden', isMuted);
+    iconOff.classList.toggle('hidden', !isMuted);
+
+    var savedTime = sessionStorage.getItem('bgm_time');
+    if (savedTime) {
+        audio.currentTime = parseFloat(savedTime);
+    }
+
+    audio.play().catch(function() {
+        function startOnInteraction() {
+            audio.play().catch(function(){});
+            document.removeEventListener('click', startOnInteraction);
+            document.removeEventListener('touchstart', startOnInteraction);
+            document.removeEventListener('keydown', startOnInteraction);
+        }
+        document.addEventListener('click', startOnInteraction);
+        document.addEventListener('touchstart', startOnInteraction);
+        document.addEventListener('keydown', startOnInteraction);
+    });
+
+    window.addEventListener('beforeunload', function() {
+        sessionStorage.setItem('bgm_time', audio.currentTime);
+    });
+
+    btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        isMuted = !isMuted;
+        audio.muted = isMuted;
+        localStorage.setItem('bgm_muted', isMuted);
+        iconOn.classList.toggle('hidden', isMuted);
+        iconOff.classList.toggle('hidden', !isMuted);
+    });
+})();
+</script>
 </body>
 </html>
