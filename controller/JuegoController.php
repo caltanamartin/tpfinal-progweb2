@@ -51,6 +51,9 @@ class JuegoController
             Redirect::to('/juego/resultado?id=' . $partidaId);
         }
 
+        $respuestaCorrecta = $_SESSION['respuesta_correcta'] ?? false;
+        unset($_SESSION['respuesta_correcta']);
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $categoriaId = $this->request->post('categoria_id');
             $_SESSION['categoria_elegida'] = $categoriaId;
@@ -58,9 +61,6 @@ class JuegoController
         }
 
         $categorias = $this->preguntaModel->getCategorias();
-
-        $respuestaCorrecta = $_SESSION['respuesta_correcta'] ?? false;
-        unset($_SESSION['respuesta_correcta']);
 
         $data = [
             'usuario' => $usuario,

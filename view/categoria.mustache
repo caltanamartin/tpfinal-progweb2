@@ -23,19 +23,30 @@
         opacity: 0;
         animation: curtainText 0.3s ease-out 0.35s forwards;
     }
+    .wheel-pointer {
+        position: absolute;
+        top: -8px;
+        left: 50%;
+        margin-left: -10px;
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-top: 16px solid #272727;
+        z-index: 1;
+        filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+    }
 </style>
 
 <div class="min-h-screen flex flex-col bg-gray-50 pt-16">
     <div class="flex-1 flex items-center justify-center px-4">
         <div class="w-full max-w-md">
-                <div class="flex justify-end items-center mb-4">
-                    <span class="text-lg font-bold text-[#00b582]">
-                        Puntaje: {{partida.puntaje}} pts
-                    </span>
-                </div>
+            <div class="flex justify-end items-center mb-4">
+                <span class="text-lg font-bold text-[#00b582]">Puntaje: {{partida.puntaje}} pts</span>
+            </div>
             <div class="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm relative overflow-hidden">
                 {{#respuestaCorrecta}}
-                <div class="anim-curtain-overlay absolute inset-0 z-10 rounded-2xl pointer-events-none overflow-hidden">
+                <div id="curtain-overlay" class="anim-curtain-overlay absolute inset-0 z-20 rounded-2xl pointer-events-none overflow-hidden">
                     <div class="anim-curtain-slide absolute inset-0 bg-green-500"></div>
                     <div class="anim-curtain-text absolute inset-0 flex items-center justify-center">
                         <div class="text-center text-white">
@@ -45,29 +56,31 @@
                     </div>
                 </div>
                 {{/respuestaCorrecta}}
-                <div class="flex justify-center gap-3 mb-6">
-                    <div class="w-10 h-10 rounded-full" style="background: #f74114;"></div>
-                    <div class="w-10 h-10 rounded-full" style="background: #007ca6;"></div>
-                    <div class="w-10 h-10 rounded-full" style="background: #00b582;"></div>
-                    <div class="w-10 h-10 rounded-full" style="background: #ffb042;"></div>
-                </div>
+
                 <h2 class="text-2xl font-bold text-center text-gray-800 mb-1">Elegí una categoría</h2>
-                <p class="text-sm text-gray-400 text-center mb-8">Seleccioná de qué tema querés la próxima pregunta</p>
+                <p class="text-sm text-gray-400 text-center mb-6">Hacé girar la ruleta para definir el tema</p>
 
                 {{#error}}
                 <p class="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">{{error}}</p>
                 {{/error}}
 
-                <form method="POST" class="space-y-3">
-                    <input type="hidden" name="id" value="{{partida.id}}">
-                    {{#categorias}}
-                    <button type="submit" name="categoria_id" value="{{id}}"
-                            class="w-full text-left px-5 py-4 rounded-xl border-2 font-semibold text-white
-                                   transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md hover:scale-[1.02]"
-                            style="background-color: {{color}}; border-color: {{color}};">
-                        {{nombre}}
+                <div class="flex justify-center mb-6">
+                    <div class="relative inline-flex items-center justify-center">
+                        <div class="wheel-pointer"></div>
+                        <canvas id="wheel-canvas" width="300" height="300"></canvas>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button id="btn-spin" type="button"
+                            class="bg-[#00b582] font-bold text-lg px-10 py-3 rounded-full text-white transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+                        GIRAR
                     </button>
-                    {{/categorias}}
+                </div>
+
+                <form id="category-form" method="POST" class="hidden">
+                    <input type="hidden" name="id" value="{{partida.id}}">
+                    <input type="hidden" name="categoria_id" id="input-categoria" value="">
                 </form>
 
                 <div class="mt-6 text-center">
@@ -76,5 +89,178 @@
             </div>
         </div>
     </div>
-    {{>footer}}
 </div>
+
+<div id="result-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40">
+    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm mx-4 text-center">
+        <div id="modal-color-bar" class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold shadow-lg"></div>
+        <p class="text-sm text-gray-500 mb-1">Categoría seleccionada</p>
+        <p id="modal-categoria-name" class="text-2xl font-bold text-gray-800 mb-6"></p>
+        <button id="btn-responder" type="button"
+                class="w-full bg-[#00b582] font-bold text-lg px-10 py-3 rounded-full text-white transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg">
+            Responder pregunta
+        </button>
+    </div>
+</div>
+
+<script>
+(function() {
+    var categorias = [
+        {{#categorias}}
+        { id: {{id}}, nombre: '{{nombre}}', color: '{{color}}' },
+        {{/categorias}}
+    ];
+
+    var canvas = document.getElementById('wheel-canvas');
+    var ctx = canvas.getContext('2d');
+    var btnSpin = document.getElementById('btn-spin');
+    var btnResponder = document.getElementById('btn-responder');
+    var modal = document.getElementById('result-modal');
+    var inputCategoria = document.getElementById('input-categoria');
+    var form = document.getElementById('category-form');
+    var modalName = document.getElementById('modal-categoria-name');
+    var modalBar = document.getElementById('modal-color-bar');
+
+    var dpr = window.devicePixelRatio || 1;
+    var size = 300;
+    canvas.width = size * dpr;
+    canvas.height = size * dpr;
+    canvas.style.width = size + 'px';
+    canvas.style.height = size + 'px';
+    ctx.scale(dpr, dpr);
+
+    var partidaId = {{partida.id}};
+    var num = categorias.length;
+    var segAngle = (2 * Math.PI) / num;
+    var currentRotation = -segAngle / 2;
+    var spinning = false;
+
+    var savedSpin = JSON.parse(sessionStorage.getItem('ruleta_spin'));
+    if (savedSpin && savedSpin.partidaId == partidaId) {
+        var cat = categorias.find(function(c) { return c.id == savedSpin.categoriaId; });
+        if (cat) {
+            modalName.textContent = cat.nombre;
+            modalBar.style.backgroundColor = cat.color;
+            inputCategoria.value = cat.id;
+            modal.classList.remove('hidden');
+            btnSpin.disabled = true;
+        } else {
+            sessionStorage.removeItem('ruleta_spin');
+        }
+    }
+
+    var curtain = document.getElementById('curtain-overlay');
+    if (curtain) {
+        curtain.addEventListener('animationend', function(e) {
+            if (e.animationName === 'curtainFade') {
+                this.style.display = 'none';
+            }
+        });
+    }
+
+    function drawWheel(rotation) {
+        var cx = size / 2;
+        var cy = size / 2;
+        var radius = size / 2 - 10;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(rotation);
+
+        for (var i = 0; i < num; i++) {
+            var start = -Math.PI / 2 + i * segAngle;
+            var end = start + segAngle;
+
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.arc(0, 0, radius, start, end);
+            ctx.closePath();
+            ctx.fillStyle = categorias[i].color;
+            ctx.fill();
+
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.save();
+            ctx.rotate(start + segAngle / 2);
+            ctx.textAlign = 'right';
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 13px system-ui, sans-serif';
+            ctx.shadowColor = 'rgba(0,0,0,0.35)';
+            ctx.shadowBlur = 3;
+            ctx.fillText(categorias[i].nombre, radius - 14, 4);
+            ctx.restore();
+        }
+
+        ctx.beginPath();
+        ctx.arc(0, 0, 26, 0, 2 * Math.PI);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+        ctx.strokeStyle = '#e5e7eb';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.restore();
+    }
+
+    function spin() {
+        if (spinning) return;
+        sessionStorage.removeItem('ruleta_spin');
+        spinning = true;
+        btnSpin.disabled = true;
+        btnSpin.textContent = 'GIRANDO...';
+
+        var chosen = Math.floor(Math.random() * num);
+        var segDeg = 360 / num;
+        var target = ((num - chosen) * segDeg) % 360;
+        if (target === 0) target = 360;
+        var total = ((5 + Math.floor(Math.random() * 4)) * 360 + target) * Math.PI / 180;
+
+        var startRot = currentRotation;
+        var endRot = startRot + total;
+        var duration = 4000 + Math.random() * 1000;
+        var startTime = null;
+
+        function animate(time) {
+            if (!startTime) startTime = time;
+            var t = Math.min((time - startTime) / duration, 1);
+            var eased = 1 - Math.pow(1 - t, 3);
+            currentRotation = startRot + total * eased;
+            drawWheel(currentRotation);
+            if (t < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                spinning = false;
+                btnSpin.textContent = 'GIRAR';
+                showResult(chosen);
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+
+    function showResult(index) {
+        var cat = categorias[index];
+        modalName.textContent = cat.nombre;
+        modalBar.style.backgroundColor = cat.color;
+        inputCategoria.value = cat.id;
+        modal.classList.remove('hidden');
+        sessionStorage.setItem('ruleta_spin', JSON.stringify({
+            partidaId: partidaId,
+            categoriaId: cat.id
+        }));
+    }
+
+    btnSpin.addEventListener('click', spin);
+
+    btnResponder.addEventListener('click', function() {
+        sessionStorage.removeItem('ruleta_spin');
+        form.submit();
+    });
+
+    drawWheel(0);
+})();
+</script>
+
+{{>footer}}
