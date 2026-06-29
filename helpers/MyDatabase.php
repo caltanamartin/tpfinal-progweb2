@@ -27,6 +27,11 @@ class MyDatabase
         return $this->conexion->insert_id;
     }
 
+    public function escape($str)
+    {
+        return $this->conexion->real_escape_string($str);
+    }
+
     public function __destruct()
     {
         $this->conexion->close();

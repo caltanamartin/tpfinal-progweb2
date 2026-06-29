@@ -136,16 +136,97 @@ class PreguntaModel
         return $this->database->query("SELECT * FROM categorias");
     }
 
-    public function reportar($preguntaId)
+    public function reportar($preguntaId, $usuarioId, $motivo)
     {
-        $sql = "UPDATE preguntas SET reportado = 1 WHERE id = $preguntaId";
+        $motivo = $this->database->escape($motivo ?: '');
+        $sql = "INSERT INTO reportes_preguntas (pregunta_id, usuario_id, motivo)
+                VALUES ($preguntaId, $usuarioId, '$motivo')";
         return $this->database->execute($sql);
     }
 
-    public function crear($categoriaId, $pregunta, $opcionA, $opcionB, $opcionC, $opcionD, $respuestaCorrecta)
+    public function crear($categoriaId, $pregunta, $opcionA, $opcionB, $opcionC, $opcionD, $respuestaCorrecta, $creadorId = null, $rol = 'usuario')
     {
-        $sql = "INSERT INTO preguntas (categoria_id, pregunta, opcion_a, opcion_b, opcion_c, opcion_d, respuesta_correcta)
-                VALUES ($categoriaId, '$pregunta', '$opcionA', '$opcionB', '$opcionC', '$opcionD', '$respuestaCorrecta')";
+        $activa = ($rol === 'editor') ? 1 : 0;
+        $creador = $creadorId ?: 'NULL';
+        $sql = "INSERT INTO preguntas (categoria_id, pregunta, opcion_a, opcion_b, opcion_c, opcion_d, respuesta_correcta, activa, creador_id)
+                VALUES ($categoriaId, '$pregunta', '$opcionA', '$opcionB', '$opcionC', '$opcionD', '$respuestaCorrecta', $activa, $creador)";
+        return $this->database->execute($sql);
+    }
+
+    public function listarTodas()
+    {
+        $sql = "SELECT p.*, c.nombre AS categoria_nombre, c.color AS categoria_color,
+                       u.username AS creador_username
+                FROM preguntas p
+                JOIN categorias c ON c.id = p.categoria_id
+                LEFT JOIN usuarios u ON u.id = p.creador_id
+                ORDER BY p.id DESC";
+        return $this->database->query($sql);
+    }
+
+    public function obtener($id)
+    {
+        $sql = "SELECT p.*, c.nombre AS categoria_nombre
+                FROM preguntas p
+                JOIN categorias c ON c.id = p.categoria_id
+                WHERE p.id = $id";
+        $result = $this->database->query($sql);
+        return !empty($result) ? $result[0] : null;
+    }
+
+    public function actualizar($id, $data)
+    {
+        $sets = [];
+        foreach ($data as $campo => $valor) {
+            $sets[] = "$campo = '$valor'";
+        }
+        $sql = "UPDATE preguntas SET " . implode(', ', $sets) . " WHERE id = $id";
+        return $this->database->execute($sql);
+    }
+
+    public function desactivar($id, $editorId)
+    {
+        $sql = "UPDATE preguntas SET activa = 0, revisada_por = $editorId, revisada_en = NOW() WHERE id = $id";
+        return $this->database->execute($sql);
+    }
+
+    public function listarReportes()
+    {
+        $sql = "SELECT rp.*, p.pregunta AS pregunta_texto, u.username AS reportado_por
+                FROM reportes_preguntas rp
+                JOIN preguntas p ON p.id = rp.pregunta_id
+                JOIN usuarios u ON u.id = rp.usuario_id
+                WHERE rp.accion IS NULL
+                ORDER BY rp.creado_en DESC";
+        return $this->database->query($sql);
+    }
+
+    public function resolverReporte($reporteId, $editorId, $accion)
+    {
+        $sql = "UPDATE reportes_preguntas SET resuelto_por = $editorId, resuelto_en = NOW(), accion = '$accion' WHERE id = $reporteId";
+        return $this->database->execute($sql);
+    }
+
+    public function listarPendientes()
+    {
+        $sql = "SELECT p.*, c.nombre AS categoria_nombre, c.color AS categoria_color, u.username AS creador_username
+                FROM preguntas p
+                JOIN categorias c ON c.id = p.categoria_id
+                LEFT JOIN usuarios u ON u.id = p.creador_id
+                WHERE p.activa = 0 AND p.revisada_por IS NULL
+                ORDER BY p.creado_en DESC";
+        return $this->database->query($sql);
+    }
+
+    public function aprobar($id, $editorId)
+    {
+        $sql = "UPDATE preguntas SET activa = 1, revisada_por = $editorId, revisada_en = NOW() WHERE id = $id";
+        return $this->database->execute($sql);
+    }
+
+    public function eliminar($id)
+    {
+        $sql = "DELETE FROM preguntas WHERE id = $id";
         return $this->database->execute($sql);
     }
 }

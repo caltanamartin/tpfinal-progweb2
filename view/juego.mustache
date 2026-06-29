@@ -33,10 +33,10 @@
                     {{^pregunta.esNeutra}}
                     <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{{pregunta.dificultad_label}}</span>
                     {{/pregunta.esNeutra}}
-                    <a href="/juego/reportar" onclick="return confirm('¿Reportar esta pregunta como inválida?')"
-                       class="ml-auto text-xs text-gray-400 hover:text-red-500 transition-colors duration-200 cursor-pointer">
+                    <button type="button" onclick="document.getElementById('report-modal').classList.remove('hidden')"
+                            class="ml-auto text-xs text-gray-400 hover:text-red-500 transition-colors duration-200 cursor-pointer">
                         Reportar
-                    </a>
+                    </button>
                 </div>
 
                 <div class="bg-white px-6 py-6">
@@ -69,6 +69,29 @@
         </div>
     </div>
     {{>footer}}
+</div>
+
+<div id="report-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm mx-4">
+        <h3 class="text-lg font-bold text-gray-800 mb-2">Reportar pregunta</h3>
+        <p class="text-sm text-gray-500 mb-4">Describí por qué considerás que esta pregunta es inválida:</p>
+        <form action="/juego/reportar" method="POST">
+            <input type="hidden" name="pregunta_id" value="{{pregunta.id}}">
+            <textarea name="motivo" rows="4" required
+                      class="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 transition-all duration-200 mb-4"
+                      placeholder="Escribí el motivo del reporte..."></textarea>
+            <div class="flex gap-3 justify-end">
+                <button type="button" onclick="document.getElementById('report-modal').classList.add('hidden')"
+                        class="px-4 py-2 rounded-xl border-2 border-gray-300 text-gray-600 font-medium hover:bg-gray-100 transition-all duration-200 cursor-pointer">
+                    Cancelar
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 rounded-xl bg-red-500 text-white font-semibold hover:bg-red-600 transition-all duration-200 cursor-pointer shadow-md">
+                    Enviar reporte
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script>

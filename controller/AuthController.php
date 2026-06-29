@@ -38,6 +38,7 @@ class AuthController
                     $data['error'] = "Tenés que verificar tu cuenta por email antes de iniciar sesión.";
                 } else {
                     $_SESSION['usuario'] = $usuario;
+                    $_SESSION['usuario']['esEditor'] = ($usuario['rol'] === 'editor');
                     Redirect::to('/');
                 }
             } else {

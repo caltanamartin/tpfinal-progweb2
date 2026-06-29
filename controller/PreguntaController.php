@@ -56,9 +56,14 @@ class PreguntaController
                 Redirect::to('/pregunta/crear');
             }
 
-            $this->preguntaModel->crear($categoriaId, $pregunta, $opcionA, $opcionB, $opcionC, $opcionD, $respuestaCorrecta);
+            $rol = $usuario['rol'] ?? 'usuario';
+            $this->preguntaModel->crear($categoriaId, $pregunta, $opcionA, $opcionB, $opcionC, $opcionD, $respuestaCorrecta, $usuario['id'], $rol);
 
-            $_SESSION['exito_pregunta'] = 'Pregunta creada correctamente. Ya está disponible en el juego.';
+            if ($rol === 'editor') {
+                $_SESSION['exito_pregunta'] = 'Pregunta creada correctamente. Ya está disponible en el juego.';
+            } else {
+                $_SESSION['exito_pregunta'] = 'Pregunta enviada. Un editor la revisará para aprobarla.';
+            }
             Redirect::to('/');
         }
     }

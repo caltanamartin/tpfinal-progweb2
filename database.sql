@@ -26,6 +26,7 @@ create table aldea_vikinga.usuarios
     foto_perfil       varchar(255)                           default null,
     verificado        tinyint(1)                             default 0,
     token_verificacion varchar(64)                            default null,
+    rol               enum('usuario','editor')               default 'usuario',
     creado_en         timestamp default current_timestamp() not null,
     unique (email),
     unique (username)
@@ -51,7 +52,9 @@ CREATE TABLE aldea_vikinga.preguntas (
     opcion_d VARCHAR(255) NOT NULL,
     respuesta_correcta ENUM('A','B','C','D') NOT NULL,
     activa              TINYINT(1) DEFAULT 1,
-    reportado           TINYINT(1) DEFAULT 0,
+    creador_id          INT NULL,
+    revisada_por        INT NULL,
+    revisada_en         TIMESTAMP NULL,
     creado_en           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (categoria_id) REFERENCES categorias(id)
 );
@@ -76,6 +79,20 @@ CREATE TABLE aldea_vikinga.partidas_preguntas (
     respondida_en TIMESTAMP NULL,
     FOREIGN KEY (partida_id) REFERENCES partidas(id),
     FOREIGN KEY (pregunta_id) REFERENCES preguntas(id)
+);
+
+CREATE TABLE aldea_vikinga.reportes_preguntas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    pregunta_id INT NOT NULL,
+    usuario_id INT NOT NULL,
+    motivo TEXT,
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    resuelto_por INT NULL,
+    resuelto_en TIMESTAMP NULL,
+    accion ENUM('aprobada','rechazada') NULL,
+    FOREIGN KEY (pregunta_id) REFERENCES preguntas(id),
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+    FOREIGN KEY (resuelto_por) REFERENCES usuarios(id)
 );
 
 INSERT INTO aldea_vikinga.categorias (nombre, color) VALUES

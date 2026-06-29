@@ -298,14 +298,26 @@ class JuegoController
             Redirect::to('/login');
         }
 
-        $sessionPartida = $_SESSION['partida_actual'] ?? null;
-        if (!$sessionPartida) {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Redirect::to('/');
         }
 
-        $this->preguntaModel->reportar($sessionPartida['pregunta_id']);
+        $preguntaId = $this->request->post('pregunta_id');
+        $motivo = $this->request->post('motivo');
+
+        if (!$preguntaId) {
+            Redirect::to('/');
+        }
+
+        $this->preguntaModel->reportar($preguntaId, $usuario['id'], $motivo);
         $_SESSION['reportado_exito'] = 'Pregunta reportada. Gracias por tu ayuda.';
-        Redirect::to('/juego?id=' . $sessionPartida['partida_id']);
+
+        $sessionPartida = $_SESSION['partida_actual'] ?? null;
+        $partidaId = $sessionPartida ? $sessionPartida['partida_id'] : null;
+        if ($partidaId) {
+            Redirect::to('/juego?id=' . $partidaId);
+        }
+        Redirect::to('/');
     }
 
     public function resultado()
