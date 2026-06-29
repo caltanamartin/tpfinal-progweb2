@@ -59,10 +59,14 @@ class JuegoController
 
         $categorias = $this->preguntaModel->getCategorias();
 
+        $respuestaCorrecta = $_SESSION['respuesta_correcta'] ?? false;
+        unset($_SESSION['respuesta_correcta']);
+
         $data = [
             'usuario' => $usuario,
             'partida' => $partida,
             'categorias' => $categorias,
+            'respuestaCorrecta' => $respuestaCorrecta,
         ];
 
         if (isset($_SESSION['error_categoria'])) {
@@ -223,6 +227,7 @@ class JuegoController
 
         if ($esCorrecta) {
             $this->partidaModel->sumarPunto($partidaId);
+            $_SESSION['respuesta_correcta'] = true;
             Redirect::to('/juego/categoria?id=' . $partidaId);
         } else {
             $this->partidaModel->terminar($partidaId);
