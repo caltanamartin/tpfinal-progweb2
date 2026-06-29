@@ -33,6 +33,15 @@ class Configurator {
         return new PreguntaController($this->getRenderer(), $this->getPreguntaModel(), new Request());
     }
 
+    public function getEditorController() {
+        return new EditorController(
+            $this->getRenderer(),
+            $this->getPreguntaModel(),
+            $this->getUsuarioModel(),
+            new Request()
+        );
+    }
+
     public function getJuegoController() {
         return new JuegoController(
             $this->getRenderer(),

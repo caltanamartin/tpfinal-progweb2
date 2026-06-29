@@ -1,0 +1,29 @@
+{{>header}}
+<div class="min-h-screen flex flex-col pt-14">
+    <div class="flex-1 flex items-center justify-center p-4">
+        <div class="w-full max-w-lg">
+            <h1 class="text-3xl font-bold text-gray-800 text-center mb-8">Panel del editor</h1>
+            <div class="space-y-4">
+                <a href="/editor/preguntas"
+                   class="block bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
+                    <h2 class="text-xl font-bold text-gray-800 mb-1">Gestionar preguntas</h2>
+                    <p class="text-sm text-gray-500">Ver, editar y desactivar preguntas del sistema.</p>
+                </a>
+                <a href="/editor/reportes"
+                   class="block bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
+                    <h2 class="text-xl font-bold text-gray-800 mb-1">Revisar reportes</h2>
+                    <p class="text-sm text-gray-500">Evaluar preguntas reportadas por usuarios.</p>
+                </a>
+                <a href="/editor/pendientes"
+                   class="block bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
+                    <h2 class="text-xl font-bold text-gray-800 mb-1">Aprobar sugerencias</h2>
+                    <p class="text-sm text-gray-500">Aprobar o rechazar preguntas creadas por usuarios.</p>
+                </a>
+            </div>
+            <div class="mt-8 text-center">
+                <a href="/" class="text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors">Volver al lobby</a>
+            </div>
+        </div>
+    </div>
+    {{>footer}}
+</div>

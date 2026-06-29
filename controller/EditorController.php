@@ -1,0 +1,305 @@
+<?php
+
+class EditorController
+{
+    private $renderer;
+    private $preguntaModel;
+    private $usuarioModel;
+    private $request;
+
+    public function __construct($renderer, $preguntaModel, $usuarioModel, $request)
+    {
+        $this->renderer = $renderer;
+        $this->preguntaModel = $preguntaModel;
+        $this->usuarioModel = $usuarioModel;
+        $this->request = $request;
+    }
+
+    private function verificarEditor()
+    {
+        $usuario = $_SESSION['usuario'] ?? null;
+        if (!$usuario || ($usuario['rol'] ?? 'usuario') !== 'editor') {
+            Redirect::to('/');
+            return null;
+        }
+        return $usuario;
+    }
+
+    public function index()
+    {
+        $usuario = $this->verificarEditor();
+        if (!$usuario) return;
+
+        $data = [
+            'usuario' => $usuario,
+            'esEditor' => true,
+        ];
+
+        $this->renderer->render('editor_index', $data);
+    }
+
+    public function preguntas()
+    {
+        $usuario = $this->verificarEditor();
+        if (!$usuario) return;
+
+        $preguntas = $this->preguntaModel->listarTodas();
+        foreach ($preguntas as &$p) {
+            $p['esCorrectaA'] = ($p['respuesta_correcta'] === 'A');
+            $p['esCorrectaB'] = ($p['respuesta_correcta'] === 'B');
+            $p['esCorrectaC'] = ($p['respuesta_correcta'] === 'C');
+            $p['esCorrectaD'] = ($p['respuesta_correcta'] === 'D');
+        }
+
+        $data = [
+            'usuario' => $usuario,
+            'esEditor' => true,
+            'preguntas' => $preguntas,
+        ];
+
+        $this->renderer->render('editor_preguntas', $data);
+    }
+
+    public function editar()
+    {
+        $usuario = $this->verificarEditor();
+        if (!$usuario) return;
+
+        $id = $this->request->get('id');
+        if (!$id) {
+            Redirect::to('/editor/preguntas');
+        }
+
+        $pregunta = $this->preguntaModel->obtener($id);
+        if (!$pregunta) {
+            Redirect::to('/editor/preguntas');
+        }
+
+        $categorias = $this->preguntaModel->getCategorias();
+        foreach ($categorias as &$cat) {
+            $cat['selected'] = ((int)$cat['id'] === (int)$pregunta['categoria_id']);
+        }
+        unset($cat);
+
+        $pregunta['esA'] = ($pregunta['respuesta_correcta'] === 'A');
+        $pregunta['esB'] = ($pregunta['respuesta_correcta'] === 'B');
+        $pregunta['esC'] = ($pregunta['respuesta_correcta'] === 'C');
+        $pregunta['esD'] = ($pregunta['respuesta_correcta'] === 'D');
+
+        $error = $_SESSION['error_editor'] ?? null;
+        unset($_SESSION['error_editor']);
+
+        $data = [
+            'usuario' => $usuario,
+            'esEditor' => true,
+            'pregunta' => $pregunta,
+            'categorias' => $categorias,
+            'error' => $error,
+        ];
+
+        $this->renderer->render('editor_editar_pregunta', $data);
+    }
+
+    public function guardar()
+    {
+        $usuario = $this->verificarEditor();
+        if (!$usuario) return;
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Redirect::to('/editor/preguntas');
+        }
+
+        $id = $this->request->post('id');
+        $categoriaId = $this->request->post('categoria_id');
+        $pregunta = $this->request->post('pregunta');
+        $opcionA = $this->request->post('opcion_a');
+        $opcionB = $this->request->post('opcion_b');
+        $opcionC = $this->request->post('opcion_c');
+        $opcionD = $this->request->post('opcion_d');
+        $respuestaCorrecta = $this->request->post('respuesta_correcta');
+
+        if (!$id || !$categoriaId || !$pregunta || !$opcionA || !$opcionB || !$opcionC || !$opcionD || !$respuestaCorrecta) {
+            $_SESSION['error_editor'] = 'Completá todos los campos.';
+            Redirect::to('/editor/preguntas/editar?id=' . $id);
+        }
+
+        $this->preguntaModel->actualizar($id, [
+            'categoria_id' => $categoriaId,
+            'pregunta' => $pregunta,
+            'opcion_a' => $opcionA,
+            'opcion_b' => $opcionB,
+            'opcion_c' => $opcionC,
+            'opcion_d' => $opcionD,
+            'respuesta_correcta' => $respuestaCorrecta,
+        ]);
+
+        $_SESSION['exito_editor'] = 'Pregunta actualizada correctamente.';
+        Redirect::to('/editor/preguntas');
+    }
+
+    public function eliminar()
+    {
+        $usuario = $this->verificarEditor();
+        if (!$usuario) return;
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Redirect::to('/editor/preguntas');
+        }
+
+        $id = $this->request->post('id');
+        if (!$id) {
+            Redirect::to('/editor/preguntas');
+        }
+
+        $this->preguntaModel->desactivar($id, $usuario['id']);
+        $_SESSION['exito_editor'] = 'Pregunta desactivada correctamente.';
+        Redirect::to('/editor/preguntas');
+    }
+
+    public function activar()
+    {
+        $usuario = $this->verificarEditor();
+        if (!$usuario) return;
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Redirect::to('/editor/preguntas');
+        }
+
+        $id = $this->request->post('id');
+        if (!$id) {
+            Redirect::to('/editor/preguntas');
+        }
+
+        $this->preguntaModel->aprobar($id, $usuario['id']);
+        $_SESSION['exito_editor'] = 'Pregunta activada correctamente.';
+        Redirect::to('/editor/preguntas');
+    }
+
+    public function reportes()
+    {
+        $usuario = $this->verificarEditor();
+        if (!$usuario) return;
+
+        $reportes = $this->preguntaModel->listarReportes();
+
+        $exito = $_SESSION['exito_editor'] ?? null;
+        unset($_SESSION['exito_editor']);
+
+        $data = [
+            'usuario' => $usuario,
+            'esEditor' => true,
+            'reportes' => $reportes,
+            'exito' => $exito,
+        ];
+
+        $this->renderer->render('editor_reportes', $data);
+    }
+
+    public function aprobarReporte()
+    {
+        $usuario = $this->verificarEditor();
+        if (!$usuario) return;
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Redirect::to('/editor/reportes');
+        }
+
+        $reporteId = $this->request->post('reporte_id');
+        $preguntaId = $this->request->post('pregunta_id');
+
+        if (!$reporteId || !$preguntaId) {
+            Redirect::to('/editor/reportes');
+        }
+
+        $this->preguntaModel->resolverReporte($reporteId, $usuario['id'], 'aprobada');
+        $this->preguntaModel->desactivar($preguntaId, $usuario['id']);
+
+        $_SESSION['exito_editor'] = 'Reporte aprobado. La pregunta fue desactivada.';
+        Redirect::to('/editor/reportes');
+    }
+
+    public function rechazarReporte()
+    {
+        $usuario = $this->verificarEditor();
+        if (!$usuario) return;
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Redirect::to('/editor/reportes');
+        }
+
+        $reporteId = $this->request->post('reporte_id');
+
+        if (!$reporteId) {
+            Redirect::to('/editor/reportes');
+        }
+
+        $this->preguntaModel->resolverReporte($reporteId, $usuario['id'], 'rechazada');
+
+        $_SESSION['exito_editor'] = 'Reporte rechazado. La pregunta se mantiene activa.';
+        Redirect::to('/editor/reportes');
+    }
+
+    public function pendientes()
+    {
+        $usuario = $this->verificarEditor();
+        if (!$usuario) return;
+
+        $pendientes = $this->preguntaModel->listarPendientes();
+        foreach ($pendientes as &$p) {
+            $p['esCorrectaA'] = ($p['respuesta_correcta'] === 'A');
+            $p['esCorrectaB'] = ($p['respuesta_correcta'] === 'B');
+            $p['esCorrectaC'] = ($p['respuesta_correcta'] === 'C');
+            $p['esCorrectaD'] = ($p['respuesta_correcta'] === 'D');
+        }
+
+        $exito = $_SESSION['exito_editor'] ?? null;
+        unset($_SESSION['exito_editor']);
+
+        $data = [
+            'usuario' => $usuario,
+            'esEditor' => true,
+            'pendientes' => $pendientes,
+            'exito' => $exito,
+        ];
+
+        $this->renderer->render('editor_pendientes', $data);
+    }
+
+    public function aprobarPendiente()
+    {
+        $usuario = $this->verificarEditor();
+        if (!$usuario) return;
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Redirect::to('/editor/pendientes');
+        }
+
+        $id = $this->request->post('id');
+        if (!$id) {
+            Redirect::to('/editor/pendientes');
+        }
+
+        $this->preguntaModel->aprobar($id, $usuario['id']);
+        $_SESSION['exito_editor'] = 'Pregunta aprobada y activada.';
+        Redirect::to('/editor/pendientes');
+    }
+
+    public function rechazarPendiente()
+    {
+        $usuario = $this->verificarEditor();
+        if (!$usuario) return;
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Redirect::to('/editor/pendientes');
+        }
+
+        $id = $this->request->post('id');
+        if (!$id) {
+            Redirect::to('/editor/pendientes');
+        }
+
+        $this->preguntaModel->eliminar($id);
+        $_SESSION['exito_editor'] = 'Pregunta rechazada y eliminada.';
+        Redirect::to('/editor/pendientes');
+    }
+}

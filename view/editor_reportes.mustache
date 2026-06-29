@@ -1,0 +1,66 @@
+{{>header}}
+<div class="min-h-screen flex flex-col pt-14">
+    <div class="flex-1 px-4 py-8 max-w-5xl mx-auto w-full">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">Reportes de preguntas</h1>
+            <a href="/editor" class="text-sm text-gray-400 hover:text-gray-600 transition-colors">Volver al panel</a>
+        </div>
+
+        {{#exito}}
+        <p class="text-sm text-green-600 bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-4">{{exito}}</p>
+        {{/exito}}
+
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-gray-50 text-gray-500 uppercase text-xs tracking-wide">
+                            <th class="text-left px-4 py-3">ID</th>
+                            <th class="text-left px-4 py-3">Pregunta</th>
+                            <th class="text-left px-4 py-3">Reportado por</th>
+                            <th class="text-left px-4 py-3">Motivo</th>
+                            <th class="text-left px-4 py-3">Fecha</th>
+                            <th class="text-right px-4 py-3">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#reportes}}
+                        <tr class="border-t border-gray-100 hover:bg-gray-50 transition-colors">
+                            <td class="px-4 py-3 text-gray-600">{{id}}</td>
+                            <td class="px-4 py-3 text-gray-800 max-w-xs truncate">{{pregunta_texto}}</td>
+                            <td class="px-4 py-3 text-gray-500">{{reportado_por}}</td>
+                            <td class="px-4 py-3 text-gray-600 max-w-xs truncate">{{motivo}}</td>
+                            <td class="px-4 py-3 text-gray-500 text-xs">{{creado_en}}</td>
+                            <td class="px-4 py-3 text-right">
+                                <div class="flex gap-2 justify-end">
+                                    <form action="/editor/reportes/aprobar" method="POST" onsubmit="return confirm('¿Aprobar reporte? La pregunta será desactivada.')">
+                                        <input type="hidden" name="reporte_id" value="{{id}}">
+                                        <input type="hidden" name="pregunta_id" value="{{pregunta_id}}">
+                                        <button type="submit"
+                                                class="text-xs px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors cursor-pointer">
+                                            Aprobar (eliminar)
+                                        </button>
+                                    </form>
+                                    <form action="/editor/reportes/rechazar" method="POST">
+                                        <input type="hidden" name="reporte_id" value="{{id}}">
+                                        <button type="submit"
+                                                class="text-xs px-3 py-1.5 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors cursor-pointer">
+                                            Rechazar
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {{/reportes}}
+                        {{^reportes}}
+                        <tr>
+                            <td colspan="6" class="px-4 py-8 text-center text-gray-400">No hay reportes pendientes.</td>
+                        </tr>
+                        {{/reportes}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {{>footer}}
+</div>
