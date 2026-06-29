@@ -50,8 +50,9 @@ CREATE TABLE aldea_vikinga.preguntas (
     opcion_c VARCHAR(255) NOT NULL,
     opcion_d VARCHAR(255) NOT NULL,
     respuesta_correcta ENUM('A','B','C','D') NOT NULL,
-    activa TINYINT(1) DEFAULT 1,
-    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    activa              TINYINT(1) DEFAULT 1,
+    reportado           TINYINT(1) DEFAULT 0,
+    creado_en           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (categoria_id) REFERENCES categorias(id)
 );
 

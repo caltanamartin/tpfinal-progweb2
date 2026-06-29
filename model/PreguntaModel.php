@@ -135,4 +135,17 @@ class PreguntaModel
     {
         return $this->database->query("SELECT * FROM categorias");
     }
+
+    public function reportar($preguntaId)
+    {
+        $sql = "UPDATE preguntas SET reportado = 1 WHERE id = $preguntaId";
+        return $this->database->execute($sql);
+    }
+
+    public function crear($categoriaId, $pregunta, $opcionA, $opcionB, $opcionC, $opcionD, $respuestaCorrecta)
+    {
+        $sql = "INSERT INTO preguntas (categoria_id, pregunta, opcion_a, opcion_b, opcion_c, opcion_d, respuesta_correcta)
+                VALUES ($categoriaId, '$pregunta', '$opcionA', '$opcionB', '$opcionC', '$opcionD', '$respuestaCorrecta')";
+        return $this->database->execute($sql);
+    }
 }

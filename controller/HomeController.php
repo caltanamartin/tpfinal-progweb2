@@ -46,6 +46,13 @@ class HomeController
         } elseif ($usuario) {
             $data["usuario"] = $usuario;
         }
+
+        $exitoPregunta = $_SESSION['exito_pregunta'] ?? null;
+        unset($_SESSION['exito_pregunta']);
+        if ($exitoPregunta) {
+            $data['exito_pregunta'] = $exitoPregunta;
+        }
+
         $this->renderer->render("landing", $data);
     }
 }

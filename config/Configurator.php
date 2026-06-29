@@ -29,6 +29,10 @@ class Configurator {
         return new PerfilController($this->getRenderer(), $this->getUsuarioModel(), new Request());
     }
 
+    public function getPreguntaController() {
+        return new PreguntaController($this->getRenderer(), $this->getPreguntaModel(), new Request());
+    }
+
     public function getJuegoController() {
         return new JuegoController(
             $this->getRenderer(),

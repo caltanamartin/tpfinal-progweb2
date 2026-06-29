@@ -151,12 +151,16 @@ class JuegoController
             $pregunta['dificultad_label'] = 'Periodo de prueba';
         }
 
+        $exito = $_SESSION['reportado_exito'] ?? null;
+        unset($_SESSION['reportado_exito']);
+
         $data = [
             'usuario' => $usuario,
             'partida' => $partida,
             'pregunta' => $pregunta,
-            'esJuego' => true,
             'tiempo_restante' => $tiempoRestante,
+            'esJuego' => true,
+            'exito' => $exito,
         ];
 
         $this->renderer->render('juego', $data);
@@ -285,6 +289,23 @@ class JuegoController
         ];
         $_SESSION['hubo_timeout'] = true;
         Redirect::to('/juego/resultado?id=' . $partidaId);
+    }
+
+    public function reportar()
+    {
+        $usuario = $_SESSION['usuario'] ?? null;
+        if (!$usuario) {
+            Redirect::to('/login');
+        }
+
+        $sessionPartida = $_SESSION['partida_actual'] ?? null;
+        if (!$sessionPartida) {
+            Redirect::to('/');
+        }
+
+        $this->preguntaModel->reportar($sessionPartida['pregunta_id']);
+        $_SESSION['reportado_exito'] = 'Pregunta reportada. Gracias por tu ayuda.';
+        Redirect::to('/juego?id=' . $sessionPartida['partida_id']);
     }
 
     public function resultado()
