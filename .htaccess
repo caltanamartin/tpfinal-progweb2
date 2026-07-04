@@ -40,6 +40,8 @@ RewriteRule ^editor/pendientes$           index.php?controller=editor&method=pen
 RewriteRule ^editor/pendientes/aprobar$   index.php?controller=editor&method=aprobarPendiente [L,QSA]
 RewriteRule ^editor/pendientes/rechazar$  index.php?controller=editor&method=rechazarPendiente [L,QSA]
 
+RewriteRule ^admin$              index.php?controller=admin&method=index [L,QSA]
+
 RewriteRule ^ranking$            index.php?controller=ranking&method=ver [L,QSA]
 RewriteRule ^verificar/(.+)$     index.php?controller=auth&method=verificar&token=$1 [L,QSA]
 

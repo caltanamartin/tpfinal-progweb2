@@ -39,6 +39,7 @@ class AuthController
                 } else {
                     $_SESSION['usuario'] = $usuario;
                     $_SESSION['usuario']['esEditor'] = ($usuario['rol'] === 'editor');
+                    $_SESSION['usuario']['esAdmin'] = ($usuario['rol'] === 'admin');
                     Redirect::to('/');
                 }
             } else {

@@ -64,7 +64,7 @@ class UsuarioModel
 
     public function getRanking($limite = 50)
     {
-        $sql = "SELECT u.id, u.username, u.nombre, u.foto_perfil,
+        $sql = "SELECT u.id, u.username, u.nombre, u.foto_perfil, u.rol,
                        IFNULL(SUM(p.puntaje), 0) AS puntaje_total,
                        COUNT(p.id) AS cantidad_partidas
                 FROM usuarios u
@@ -73,6 +73,112 @@ class UsuarioModel
                 GROUP BY u.id
                 ORDER BY puntaje_total DESC
                 LIMIT $limite";
+        return $this->database->query($sql);
+    }
+
+    public function getTotalJugadores($filtro = 'mes')
+    {
+        $intervalo = $this->intervaloSql($filtro);
+        $sql = "SELECT COUNT(*) AS total FROM usuarios WHERE verificado = 1 AND creado_en >= DATE_SUB(NOW(), INTERVAL $intervalo)";
+        $result = $this->database->query($sql);
+        return $result[0]['total'];
+    }
+
+    public function getUsuariosNuevosPorPeriodo($filtro = 'mes')
+    {
+        $intervalo = $this->intervaloSql($filtro);
+        $formato = $this->formatoPeriodoSql($filtro, 'creado_en');
+        $sql = "SELECT $formato AS periodo, COUNT(*) AS total
+                FROM usuarios
+                WHERE creado_en >= DATE_SUB(NOW(), INTERVAL $intervalo)
+                GROUP BY periodo ORDER BY periodo";
+        return $this->database->query($sql);
+    }
+
+    public function getUsuariosPorPais($filtro = 'mes')
+    {
+        $intervalo = $this->intervaloSql($filtro);
+        $sql = "SELECT pais, COUNT(*) AS total
+                FROM usuarios
+                WHERE pais != '' AND creado_en >= DATE_SUB(NOW(), INTERVAL $intervalo)
+                GROUP BY pais ORDER BY total DESC";
+        return $this->database->query($sql);
+    }
+
+    public function getUsuariosPorRol()
+    {
+        $sql = "SELECT rol, COUNT(*) AS total
+                FROM usuarios
+                GROUP BY rol";
+        return $this->database->query($sql);
+    }
+
+    public function getUsuariosPorSexo($filtro = 'mes')
+    {
+        $intervalo = $this->intervaloSql($filtro);
+        $sql = "SELECT sexo, COUNT(*) AS total
+                FROM usuarios
+                WHERE creado_en >= DATE_SUB(NOW(), INTERVAL $intervalo)
+                GROUP BY sexo";
+        return $this->database->query($sql);
+    }
+
+    public function getUsuariosPorEdad($filtro = 'mes')
+    {
+        $intervalo = $this->intervaloSql($filtro);
+        $sql = "SELECT
+                    CASE
+                        WHEN anio_nacimiento IS NULL THEN 'Sin especificar'
+                        WHEN TIMESTAMPDIFF(YEAR, anio_nacimiento, CURDATE()) < 18 THEN 'Menores'
+                        WHEN TIMESTAMPDIFF(YEAR, anio_nacimiento, CURDATE()) >= 65 THEN 'Jubilados'
+                        ELSE 'Medio'
+                    END AS grupo_etario,
+                    COUNT(*) AS total
+                FROM usuarios
+                WHERE creado_en >= DATE_SUB(NOW(), INTERVAL $intervalo)
+                GROUP BY grupo_etario
+                ORDER BY FIELD(grupo_etario, 'Menores', 'Medio', 'Jubilados', 'Sin especificar')";
+        return $this->database->query($sql);
+    }
+
+    public function getPorcentajeCorrectasPorUsuario($filtro = 'mes')
+    {
+        $intervalo = $this->intervaloSql($filtro);
+        $sql = "SELECT u.id, u.username, u.nombre, u.foto_perfil,
+                       COUNT(pp.id) AS total_respuestas,
+                       IFNULL(SUM(pp.es_correcta), 0) AS respuestas_correctas,
+                       IFNULL(ROUND(SUM(pp.es_correcta) / COUNT(pp.id) * 100, 1), 0) AS porcentaje
+                FROM usuarios u
+                JOIN partidas p ON p.usuario_id = u.id AND p.estado = 'terminada'
+                JOIN partidas_preguntas pp ON pp.partida_id = p.id
+                WHERE u.verificado = 1 AND pp.respondida_en >= DATE_SUB(NOW(), INTERVAL $intervalo)
+                GROUP BY u.id
+                ORDER BY porcentaje DESC";
+        return $this->database->query($sql);
+    }
+
+    private function intervaloSql($filtro)
+    {
+        switch ($filtro) {
+            case 'dia': return '1 DAY';
+            case 'semana': return '1 WEEK';
+            case 'anio': return '1 YEAR';
+            default: return '1 MONTH';
+        }
+    }
+
+    private function formatoPeriodoSql($filtro, $columna)
+    {
+        switch ($filtro) {
+            case 'dia': return "DATE_FORMAT($columna, '%Y-%m-%d %H:00')";
+            case 'anio': return "DATE_FORMAT($columna, '%Y-%m')";
+            default: return "DATE($columna)";
+        }
+    }
+
+    public function getAll()
+    {
+        $sql = "SELECT id, email, nombre, username, anio_nacimiento, sexo, pais, ciudad, foto_perfil, verificado, rol, creado_en FROM usuarios ORDER BY id";
         return $this->database->query($sql);
     }
 

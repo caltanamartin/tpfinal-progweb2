@@ -1,0 +1,132 @@
+{{! ============ TAB USUARIOS ============ }}
+<div id="tab-usuarios" class="tab-content">
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-6 mb-6">
+        <div id="chart-line-usuarios" style="height: 280px;"></div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+            <div id="chart-pais" style="height: 220px;"></div>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+            <div id="chart-sexo" style="height: 220px;"></div>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+            <div id="chart-rol" style="height: 220px;"></div>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+            <div id="chart-edad" style="height: 220px;"></div>
+        </div>
+    </div>
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-6 mb-6">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">% Respuestas correctas por usuario</h2>
+        <div id="chart-tabla"></div>
+    </div>
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="bg-gray-50 text-gray-500 uppercase text-xs tracking-wide">
+                        <th class="text-left px-4 py-3">ID</th>
+                        <th class="text-left px-4 py-3">Username</th>
+                        <th class="text-left px-4 py-3">Nombre</th>
+                        <th class="text-left px-4 py-3">Email</th>
+                        <th class="text-left px-4 py-3">País</th>
+                        <th class="text-left px-4 py-3">Sexo</th>
+                        <th class="text-left px-4 py-3">Rol</th>
+                        <th class="text-right px-4 py-3">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#todosUsuarios}}
+                    <tr class="border-t border-gray-100 hover:bg-gray-50 transition-colors">
+                        <td class="px-4 py-3 text-gray-600">{{id}}</td>
+                        <td class="px-4 py-3 font-medium text-gray-800">{{username}}</td>
+                        <td class="px-4 py-3 text-gray-800">{{nombre}}</td>
+                        <td class="px-4 py-3 text-gray-500">{{email}}</td>
+                        <td class="px-4 py-3 text-gray-500">{{pais}}</td>
+                        <td class="px-4 py-3 text-gray-500">{{sexo}}</td>
+                        <td class="px-4 py-3">
+                            <span class="text-xs px-2 py-0.5 rounded-full {{#rol_admin}}bg-purple-100 text-purple-700{{/rol_admin}}{{#rol_editor}}bg-orange-100 text-orange-700{{/rol_editor}}{{#rol_usuario}}bg-gray-100 text-gray-600{{/rol_usuario}}">
+                                {{#rol_admin}}Admin{{/rol_admin}}{{#rol_editor}}Editor{{/rol_editor}}{{#rol_usuario}}Jugador{{/rol_usuario}}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-right">
+                            <button type="button" onclick="document.getElementById('modal-usuario-{{id}}').classList.remove('hidden')"
+                                    class="text-xs px-3 py-1.5 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer">
+                                Ver
+                            </button>
+                        </td>
+                    </tr>
+
+                    <div id="modal-usuario-{{id}}" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                        <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg mx-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-bold text-gray-800">Detalle de usuario</h3>
+                                <button type="button" onclick="document.getElementById('modal-usuario-{{id}}').classList.add('hidden')"
+                                        class="text-gray-400 hover:text-gray-600 text-xl leading-none cursor-pointer">&times;</button>
+                            </div>
+                            <dl class="space-y-3 text-sm">
+                                <div class="flex justify-between border-b border-gray-100 pb-2">
+                                    <dt class="text-gray-500">ID</dt>
+                                    <dd class="text-gray-800 font-medium">{{id}}</dd>
+                                </div>
+                                <div class="flex justify-between border-b border-gray-100 pb-2">
+                                    <dt class="text-gray-500">Username</dt>
+                                    <dd class="text-gray-800 font-medium">{{username}}</dd>
+                                </div>
+                                <div class="flex justify-between border-b border-gray-100 pb-2">
+                                    <dt class="text-gray-500">Nombre</dt>
+                                    <dd class="text-gray-800">{{nombre}}</dd>
+                                </div>
+                                <div class="flex justify-between border-b border-gray-100 pb-2">
+                                    <dt class="text-gray-500">Email</dt>
+                                    <dd class="text-gray-800">{{email}}</dd>
+                                </div>
+                                <div class="flex justify-between border-b border-gray-100 pb-2">
+                                    <dt class="text-gray-500">País</dt>
+                                    <dd class="text-gray-800">{{pais}}</dd>
+                                </div>
+                                <div class="flex justify-between border-b border-gray-100 pb-2">
+                                    <dt class="text-gray-500">Ciudad</dt>
+                                    <dd class="text-gray-800">{{ciudad}}</dd>
+                                </div>
+                                <div class="flex justify-between border-b border-gray-100 pb-2">
+                                    <dt class="text-gray-500">Sexo</dt>
+                                    <dd class="text-gray-800">{{sexo}}</dd>
+                                </div>
+                                <div class="flex justify-between border-b border-gray-100 pb-2">
+                                    <dt class="text-gray-500">Nacimiento</dt>
+                                    <dd class="text-gray-800">{{anio_nacimiento}}</dd>
+                                </div>
+                                <div class="flex justify-between border-b border-gray-100 pb-2">
+                                    <dt class="text-gray-500">Rol</dt>
+                                    <dd class="text-gray-800">{{rol}}</dd>
+                                </div>
+                                <div class="flex justify-between border-b border-gray-100 pb-2">
+                                    <dt class="text-gray-500">Verificado</dt>
+                                    <dd class="text-gray-800">{{verificadoSi}}</dd>
+                                </div>
+                                <div class="flex justify-between pb-2">
+                                    <dt class="text-gray-500">Creado</dt>
+                                    <dd class="text-gray-800">{{creado_en}}</dd>
+                                </div>
+                            </dl>
+                            <div class="mt-6 text-center">
+                                <button type="button" onclick="document.getElementById('modal-usuario-{{id}}').classList.add('hidden')"
+                                        class="px-6 py-2 rounded-xl border-2 border-gray-300 text-gray-600 font-medium hover:bg-gray-100 transition-all duration-200 cursor-pointer">
+                                    Cerrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {{/todosUsuarios}}
+                    {{^todosUsuarios}}
+                    <tr>
+                        <td colspan="8" class="px-4 py-8 text-center text-gray-400">No hay usuarios.</td>
+                    </tr>
+                    {{/todosUsuarios}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

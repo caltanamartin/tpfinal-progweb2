@@ -23,6 +23,7 @@ class PerfilController
 
         $usuario = $this->model->getUsuarioConEstadisticas($usuario['id']);
         $usuario['esEditor'] = ($_SESSION['usuario']['rol'] ?? 'usuario') === 'editor';
+        $usuario['esAdmin'] = ($_SESSION['usuario']['rol'] ?? 'usuario') === 'admin';
         $qrUrl = $this->buildQrUrl($usuario['id']);
         
         $this->renderer->render("perfil", [
@@ -71,6 +72,7 @@ class PerfilController
                 $this->model->actualizar($usuario['username'], $cambios);
                 $_SESSION['usuario'] = $this->model->getByUsername($usuario['username']);
                 $_SESSION['usuario']['esEditor'] = ($_SESSION['usuario']['rol'] ?? 'usuario') === 'editor';
+                $_SESSION['usuario']['esAdmin'] = ($_SESSION['usuario']['rol'] ?? 'usuario') === 'admin';
             }
 
             Redirect::to('/perfil');
@@ -108,6 +110,7 @@ class PerfilController
         }
 
         $usuario['esEditor'] = ($_SESSION['usuario']['rol'] ?? 'usuario') === 'editor';
+        $usuario['esAdmin'] = ($_SESSION['usuario']['rol'] ?? 'usuario') === 'admin';
         $qrUrl = $this->buildQrUrl($usuario['id']);
 
         $this->renderer->render("perfil", [

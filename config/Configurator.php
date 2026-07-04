@@ -33,6 +33,16 @@ class Configurator {
         return new PreguntaController($this->getRenderer(), $this->getPreguntaModel(), new Request());
     }
 
+    public function getAdminController() {
+        return new AdminController(
+            $this->getRenderer(),
+            $this->getUsuarioModel(),
+            $this->getPartidaModel(),
+            $this->getPreguntaModel(),
+            new Request()
+        );
+    }
+
     public function getEditorController() {
         return new EditorController(
             $this->getRenderer(),

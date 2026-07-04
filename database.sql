@@ -26,7 +26,7 @@ create table aldea_vikinga.usuarios
     foto_perfil       varchar(255)                           default null,
     verificado        tinyint(1)                             default 0,
     token_verificacion varchar(64)                            default null,
-    rol               enum('usuario','editor')               default 'usuario',
+    rol               enum('usuario','editor','admin')        default 'usuario',
     creado_en         timestamp default current_timestamp() not null,
     unique (email),
     unique (username)

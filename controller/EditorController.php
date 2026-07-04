@@ -25,6 +25,21 @@ class EditorController
         return $usuario;
     }
 
+    private function verificarEditorOAdmin()
+    {
+        $usuario = $_SESSION['usuario'] ?? null;
+        if (!$usuario || !in_array($usuario['rol'] ?? '', ['editor', 'admin'])) {
+            Redirect::to('/');
+            return null;
+        }
+        return $usuario;
+    }
+
+    private function backUrl($usuario)
+    {
+        return ($usuario['rol'] === 'admin') ? '/admin#preguntas' : '/editor/preguntas';
+    }
+
     public function index()
     {
         $usuario = $this->verificarEditor();
@@ -53,8 +68,10 @@ class EditorController
 
         $data = [
             'usuario' => $usuario,
-            'esEditor' => true,
+            'esEditor' => ($usuario['rol'] === 'editor'),
+            'esAdmin' => ($usuario['rol'] === 'admin'),
             'preguntas' => $preguntas,
+            'backUrl' => $this->backUrl($usuario),
         ];
 
         $this->renderer->render('editor_preguntas', $data);
@@ -62,17 +79,17 @@ class EditorController
 
     public function editar()
     {
-        $usuario = $this->verificarEditor();
+        $usuario = $this->verificarEditorOAdmin();
         if (!$usuario) return;
 
         $id = $this->request->get('id');
         if (!$id) {
-            Redirect::to('/editor/preguntas');
+            Redirect::to($this->backUrl($usuario));
         }
 
         $pregunta = $this->preguntaModel->obtener($id);
         if (!$pregunta) {
-            Redirect::to('/editor/preguntas');
+            Redirect::to($this->backUrl($usuario));
         }
 
         $categorias = $this->preguntaModel->getCategorias();
@@ -91,10 +108,12 @@ class EditorController
 
         $data = [
             'usuario' => $usuario,
-            'esEditor' => true,
+            'esEditor' => ($usuario['rol'] === 'editor'),
+            'esAdmin' => ($usuario['rol'] === 'admin'),
             'pregunta' => $pregunta,
             'categorias' => $categorias,
             'error' => $error,
+            'backUrl' => $this->backUrl($usuario),
         ];
 
         $this->renderer->render('editor_editar_pregunta', $data);
@@ -102,11 +121,11 @@ class EditorController
 
     public function guardar()
     {
-        $usuario = $this->verificarEditor();
+        $usuario = $this->verificarEditorOAdmin();
         if (!$usuario) return;
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            Redirect::to('/editor/preguntas');
+            Redirect::to($this->backUrl($usuario));
         }
 
         $id = $this->request->post('id');
@@ -117,6 +136,8 @@ class EditorController
         $opcionC = $this->request->post('opcion_c');
         $opcionD = $this->request->post('opcion_d');
         $respuestaCorrecta = $this->request->post('respuesta_correcta');
+
+        $backUrl = $this->backUrl($usuario);
 
         if (!$id || !$categoriaId || !$pregunta || !$opcionA || !$opcionB || !$opcionC || !$opcionD || !$respuestaCorrecta) {
             $_SESSION['error_editor'] = 'Completá todos los campos.';
@@ -134,45 +155,45 @@ class EditorController
         ]);
 
         $_SESSION['exito_editor'] = 'Pregunta actualizada correctamente.';
-        Redirect::to('/editor/preguntas');
+        Redirect::to($backUrl);
     }
 
     public function eliminar()
     {
-        $usuario = $this->verificarEditor();
+        $usuario = $this->verificarEditorOAdmin();
         if (!$usuario) return;
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            Redirect::to('/editor/preguntas');
+            Redirect::to($this->backUrl($usuario));
         }
 
         $id = $this->request->post('id');
         if (!$id) {
-            Redirect::to('/editor/preguntas');
+            Redirect::to($this->backUrl($usuario));
         }
 
         $this->preguntaModel->desactivar($id, $usuario['id']);
         $_SESSION['exito_editor'] = 'Pregunta desactivada correctamente.';
-        Redirect::to('/editor/preguntas');
+        Redirect::to($this->backUrl($usuario));
     }
 
     public function activar()
     {
-        $usuario = $this->verificarEditor();
+        $usuario = $this->verificarEditorOAdmin();
         if (!$usuario) return;
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            Redirect::to('/editor/preguntas');
+            Redirect::to($this->backUrl($usuario));
         }
 
         $id = $this->request->post('id');
         if (!$id) {
-            Redirect::to('/editor/preguntas');
+            Redirect::to($this->backUrl($usuario));
         }
 
         $this->preguntaModel->aprobar($id, $usuario['id']);
         $_SESSION['exito_editor'] = 'Pregunta activada correctamente.';
-        Redirect::to('/editor/preguntas');
+        Redirect::to($this->backUrl($usuario));
     }
 
     public function reportes()

@@ -1,0 +1,231 @@
+{{>header}}
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+google.charts.load('current', { packages: ['corechart', 'bar', 'table'] });
+google.charts.setOnLoadCallback(function () {
+    drawCharts();
+    setTimeout(function () {
+        var tab = location.hash.replace('#', '') || 'usuarios';
+        if (['usuarios', 'partidas', 'preguntas'].indexOf(tab) === -1) tab = 'usuarios';
+        showTab(tab);
+    }, 50);
+});
+
+function showTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(function (el) {
+        el.classList.add('hidden');
+    });
+    document.getElementById('tab-' + tab).classList.remove('hidden');
+
+    document.querySelectorAll('.tab-btn').forEach(function (el) {
+        el.classList.remove('bg-purple-600', 'text-white');
+        el.classList.add('bg-gray-200', 'text-gray-700');
+    });
+    var btn = document.querySelector('[data-tab="' + tab + '"]');
+    btn.classList.remove('bg-gray-200', 'text-gray-700');
+    btn.classList.add('bg-purple-600', 'text-white');
+
+    if (tab === 'usuarios') {
+        drawLineUsuarios();
+        drawPaisChart();
+        drawSexoChart();
+        drawRolChart();
+        drawEdadChart();
+        drawTablaPorcentajes();
+    } else if (tab === 'partidas') {
+        drawLinePartidas();
+    }
+}
+
+function drawCharts() {
+    drawLineUsuarios();
+    drawLinePartidas();
+    drawPaisChart();
+    drawSexoChart();
+    drawRolChart();
+    drawEdadChart();
+    drawTablaPorcentajes();
+}
+
+function drawLineUsuarios() {
+    var el = document.getElementById('chart-line-usuarios');
+    if (!el) return;
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Período');
+    data.addColumn('number', 'Usuarios nuevos');
+    var raw = {{{seriesTiempoJson}}};
+    if (raw.length === 0) {
+        el.innerHTML = '<p class="text-gray-400 text-center py-8">Sin datos</p>';
+        return;
+    }
+    raw.forEach(function (r) { data.addRow([r.periodo, r.usuarios]); });
+    new google.visualization.LineChart(el).draw(data, {
+        title: 'Usuarios nuevos', curveType: 'function',
+        legend: { position: 'bottom' },
+        chartArea: { width: '85%', height: '65%' },
+        hAxis: { textRotation: {{#esDia}}90{{/esDia}}{{#esSemana}}45{{/esSemana}}{{#esMes}}45{{/esMes}}{{#esAnio}}0{{/esAnio}} },
+        colors: ['#00b582'],
+    });
+}
+
+function drawLinePartidas() {
+    var el = document.getElementById('chart-line-partidas');
+    if (!el) return;
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Período');
+    data.addColumn('number', 'Partidas jugadas');
+    var raw = {{{seriesTiempoJson}}};
+    if (raw.length === 0) {
+        el.innerHTML = '<p class="text-gray-400 text-center py-8">Sin datos</p>';
+        return;
+    }
+    raw.forEach(function (r) { data.addRow([r.periodo, r.partidas]); });
+    new google.visualization.LineChart(el).draw(data, {
+        title: 'Partidas jugadas', curveType: 'function',
+        legend: { position: 'bottom' },
+        chartArea: { width: '85%', height: '65%' },
+        hAxis: { textRotation: {{#esDia}}90{{/esDia}}{{#esSemana}}45{{/esSemana}}{{#esMes}}45{{/esMes}}{{#esAnio}}0{{/esAnio}} },
+        colors: ['#007ca6'],
+    });
+}
+
+function drawPaisChart() {
+    var el = document.getElementById('chart-pais');
+    if (!el) return;
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'País');
+    data.addColumn('number', 'Usuarios');
+    var raw = {{{usuariosPorPaisJson}}};
+    if (raw.length === 0) { el.innerHTML = '<p class="text-gray-400 text-center py-8">Sin datos</p>'; return; }
+    raw.forEach(function (r) { data.addRow([r.pais, parseInt(r.total)]); });
+    new google.visualization.ColumnChart(el).draw(data, {
+        title: 'Usuarios por país', legend: { position: 'none' },
+        chartArea: { width: '80%', height: '65%' }, colors: ['#8b5cf6'],
+        hAxis: { textRotation: 45 },
+    });
+}
+
+function drawSexoChart() {
+    var el = document.getElementById('chart-sexo');
+    if (!el) return;
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Sexo');
+    data.addColumn('number', 'Usuarios');
+    var raw = {{{usuariosPorSexoJson}}};
+    if (raw.length === 0) { el.innerHTML = '<p class="text-gray-400 text-center py-8">Sin datos</p>'; return; }
+    raw.forEach(function (r) { data.addRow([r.sexo, parseInt(r.total)]); });
+    new google.visualization.PieChart(el).draw(data, {
+        title: 'Usuarios por sexo', pieHole: 0.4,
+        chartArea: { width: '85%', height: '75%' },
+        colors: ['#007ca6', '#f74114', '#ffb042'],
+    });
+}
+
+function drawRolChart() {
+    var el = document.getElementById('chart-rol');
+    if (!el) return;
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Rol');
+    data.addColumn('number', 'Usuarios');
+    var raw = {{{usuariosPorRolJson}}};
+    if (raw.length === 0) { el.innerHTML = '<p class="text-gray-400 text-center py-8">Sin datos</p>'; return; }
+    var labels = { 'usuario': 'Jugador', 'editor': 'Editor', 'admin': 'Administrador' };
+    raw.forEach(function (r) { data.addRow([labels[r.rol] || r.rol, parseInt(r.total)]); });
+    new google.visualization.PieChart(el).draw(data, {
+        title: 'Usuarios por rol', pieHole: 0.4,
+        chartArea: { width: '85%', height: '75%' },
+        colors: ['#00b582', '#f74114', '#8b5cf6'],
+    });
+}
+
+function drawEdadChart() {
+    var el = document.getElementById('chart-edad');
+    if (!el) return;
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Grupo etario');
+    data.addColumn('number', 'Usuarios');
+    var raw = {{{usuariosPorEdadJson}}};
+    if (raw.length === 0) { el.innerHTML = '<p class="text-gray-400 text-center py-8">Sin datos</p>'; return; }
+    raw.forEach(function (r) { data.addRow([r.grupo_etario, parseInt(r.total)]); });
+    new google.visualization.BarChart(el).draw(data, {
+        title: 'Usuarios por grupo de edad', legend: { position: 'none' },
+        chartArea: { width: '70%', height: '65%' },
+        colors: ['#f74114', '#00b582', '#007ca6', '#ffb042'],
+    });
+}
+
+function drawTablaPorcentajes() {
+    var el = document.getElementById('chart-tabla');
+    if (!el) return;
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Usuario');
+    data.addColumn('number', 'Total');
+    data.addColumn('number', 'Correctas');
+    data.addColumn('number', '%');
+    var raw = {{{porcentajeCorrectasJson}}};
+    if (raw.length === 0) { el.innerHTML = '<p class="text-gray-400 text-center py-8">Sin datos</p>'; return; }
+    raw.forEach(function (r) {
+        data.addRow([r.username, parseInt(r.total_respuestas), parseInt(r.respuestas_correctas), parseFloat(r.porcentaje)]);
+    });
+    var fmt = new google.visualization.NumberFormat({ suffix: '%', pattern: '#.#' });
+    fmt.format(data, 3);
+    new google.visualization.Table(el).draw(data, { page: 'enable', pageSize: 10, width: '100%' });
+}
+</script>
+<style>
+@media print {
+    header, .no-print { display: none !important; }
+    body { padding-top: 0 !important; }
+    .tab-content.hidden { display: block !important; }
+}
+</style>
+<div class="min-h-screen flex flex-col pt-14">
+    <div class="flex-1 px-4 py-8 max-w-5xl mx-auto w-full">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 no-print">
+            <h1 class="text-2xl font-bold text-gray-800">Panel de administración</h1>
+            <div class="flex items-center gap-2">
+                <a href="/admin?filtro=dia" class="text-xs px-3 py-1.5 rounded-lg transition-colors {{#esDia}}bg-purple-600 text-white{{/esDia}}{{^esDia}}bg-gray-200 text-gray-700 hover:bg-gray-300{{/esDia}}">Día</a>
+                <a href="/admin?filtro=semana" class="text-xs px-3 py-1.5 rounded-lg transition-colors {{#esSemana}}bg-purple-600 text-white{{/esSemana}}{{^esSemana}}bg-gray-200 text-gray-700 hover:bg-gray-300{{/esSemana}}">Semana</a>
+                <a href="/admin?filtro=mes" class="text-xs px-3 py-1.5 rounded-lg transition-colors {{#esMes}}bg-purple-600 text-white{{/esMes}}{{^esMes}}bg-gray-200 text-gray-700 hover:bg-gray-300{{/esMes}}">Mes</a>
+                <a href="/admin?filtro=anio" class="text-xs px-3 py-1.5 rounded-lg transition-colors {{#esAnio}}bg-purple-600 text-white{{/esAnio}}{{^esAnio}}bg-gray-200 text-gray-700 hover:bg-gray-300{{/esAnio}}">Año</a>
+                <button onclick="window.print()" class="text-xs px-3 py-1.5 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors cursor-pointer">Imprimir</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+                <p class="text-sm text-gray-500 mb-1">Jugadores</p>
+                <p class="text-3xl font-bold text-gray-800">{{totalJugadores}}</p>
+            </div>
+            <div class="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+                <p class="text-sm text-gray-500 mb-1">Partidas jugadas</p>
+                <p class="text-3xl font-bold text-gray-800">{{totalPartidas}}</p>
+            </div>
+            <div class="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+                <p class="text-sm text-gray-500 mb-1">Preguntas activas</p>
+                <p class="text-3xl font-bold text-gray-800">{{preguntasActivas}}</p>
+            </div>
+            <div class="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+                <p class="text-sm text-gray-500 mb-1">Preguntas creadas</p>
+                <p class="text-3xl font-bold text-gray-800">{{totalPreguntas}}</p>
+            </div>
+        </div>
+
+        <div class="flex gap-2 mb-6 no-print">
+            <button data-tab="usuarios" onclick="showTab('usuarios')" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg bg-purple-600 text-white transition-colors cursor-pointer">Usuarios</button>
+            <button data-tab="partidas" onclick="showTab('partidas')" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors cursor-pointer">Partidas</button>
+            <button data-tab="preguntas" onclick="showTab('preguntas')" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors cursor-pointer">Preguntas</button>
+        </div>
+
+        {{>admin_tab_usuarios}}
+
+        {{>admin_tab_partidas}}
+
+        {{>admin_tab_preguntas}}
+
+        <div class="mt-8 text-center no-print">
+            <a href="/" class="text-sm text-gray-400 hover:text-gray-600 transition-colors">Volver al lobby</a>
+        </div>
+    </div>
+    {{>footer}}
+</div>

@@ -57,6 +57,57 @@ class PartidaModel
         return $result[0]['id'];
     }
 
+    public function getTotalPartidas($filtro = 'mes')
+    {
+        $intervalo = $this->intervaloSql($filtro);
+        $sql = "SELECT COUNT(*) AS total FROM partidas WHERE estado = 'terminada' AND terminada_en >= DATE_SUB(NOW(), INTERVAL $intervalo)";
+        $result = $this->database->query($sql);
+        return $result[0]['total'];
+    }
+
+    public function getPartidasPorPeriodo($filtro = 'mes')
+    {
+        $intervalo = $this->intervaloSql($filtro);
+        $formato = $this->formatoPeriodoSql($filtro, 'terminada_en');
+        $sql = "SELECT $formato AS periodo, COUNT(*) AS total
+                FROM partidas
+                WHERE estado = 'terminada' AND terminada_en >= DATE_SUB(NOW(), INTERVAL $intervalo)
+                GROUP BY periodo ORDER BY periodo";
+        return $this->database->query($sql);
+    }
+
+    private function intervaloSql($filtro)
+    {
+        switch ($filtro) {
+            case 'dia': return '1 DAY';
+            case 'semana': return '1 WEEK';
+            case 'anio': return '1 YEAR';
+            default: return '1 MONTH';
+        }
+    }
+
+    private function formatoPeriodoSql($filtro, $columna)
+    {
+        switch ($filtro) {
+            case 'dia': return "DATE_FORMAT($columna, '%Y-%m-%d %H:00')";
+            case 'anio': return "DATE_FORMAT($columna, '%Y-%m')";
+            default: return "DATE($columna)";
+        }
+    }
+
+    public function getTodas()
+    {
+        $sql = "SELECT p.*, u.username,
+                       COUNT(pp.id) AS total_preguntas,
+                       IFNULL(SUM(pp.es_correcta), 0) AS respuestas_correctas
+                FROM partidas p
+                JOIN usuarios u ON u.id = p.usuario_id
+                LEFT JOIN partidas_preguntas pp ON pp.partida_id = p.id
+                GROUP BY p.id
+                ORDER BY p.id DESC";
+        return $this->database->query($sql);
+    }
+
     public function tienePartidas($usuarioId)
     {
         $sql = "SELECT COUNT(*) AS total FROM partidas WHERE usuario_id = $usuarioId AND estado = 'terminada'";
