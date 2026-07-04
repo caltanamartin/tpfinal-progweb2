@@ -42,7 +42,7 @@ class EditorController
 
     public function index()
     {
-        $usuario = $this->verificarEditor();
+        $usuario = $this->verificarEditorOAdmin();
         if (!$usuario) return;
 
         $data = [
@@ -55,7 +55,7 @@ class EditorController
 
     public function preguntas()
     {
-        $usuario = $this->verificarEditor();
+        $usuario = $this->verificarEditorOAdmin();
         if (!$usuario) return;
 
         $preguntas = $this->preguntaModel->listarTodas();
@@ -198,7 +198,7 @@ class EditorController
 
     public function reportes()
     {
-        $usuario = $this->verificarEditor();
+        $usuario = $this->verificarEditorOAdmin();
         if (!$usuario) return;
 
         $reportes = $this->preguntaModel->listarReportes();
@@ -218,7 +218,7 @@ class EditorController
 
     public function aprobarReporte()
     {
-        $usuario = $this->verificarEditor();
+        $usuario = $this->verificarEditorOAdmin();
         if (!$usuario) return;
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -241,7 +241,7 @@ class EditorController
 
     public function rechazarReporte()
     {
-        $usuario = $this->verificarEditor();
+        $usuario = $this->verificarEditorOAdmin();
         if (!$usuario) return;
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -262,7 +262,7 @@ class EditorController
 
     public function pendientes()
     {
-        $usuario = $this->verificarEditor();
+        $usuario = $this->verificarEditorOAdmin();
         if (!$usuario) return;
 
         $pendientes = $this->preguntaModel->listarPendientes();
@@ -288,7 +288,7 @@ class EditorController
 
     public function aprobarPendiente()
     {
-        $usuario = $this->verificarEditor();
+        $usuario = $this->verificarEditorOAdmin();
         if (!$usuario) return;
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -307,7 +307,7 @@ class EditorController
 
     public function rechazarPendiente()
     {
-        $usuario = $this->verificarEditor();
+        $usuario = $this->verificarEditorOAdmin();
         if (!$usuario) return;
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

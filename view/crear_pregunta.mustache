@@ -10,20 +10,14 @@
                     <div class="w-10 h-10 rounded-full" style="background: #ffb042;"></div>
                 </div>
                 <h2 class="text-2xl font-bold text-center text-gray-800 mb-1">
-                    {{#usuario.esEditor}}
-                    Crear nueva pregunta
-                    {{/usuario.esEditor}}
-                    {{^usuario.esEditor}}
-                    Sugerir una pregunta
-                    {{/usuario.esEditor}}
+                    {{#usuario.esEditor}}Crear nueva pregunta{{/usuario.esEditor}}
+                    {{#usuario.esAdmin}}Crear nueva pregunta{{/usuario.esAdmin}}
+                    {{^usuario.esEditor}}{{^usuario.esAdmin}}Sugerir una pregunta{{/usuario.esAdmin}}{{/usuario.esEditor}}
                 </h2>
                 <p class="text-sm text-gray-400 text-center mb-8">
-                    {{#usuario.esEditor}}
-                    Completá todos los campos para agregar una pregunta.
-                    {{/usuario.esEditor}}
-                    {{^usuario.esEditor}}
-                    Completá todos los campos para sugerir una pregunta.
-                    {{/usuario.esEditor}}
+                    {{#usuario.esEditor}}Completá todos los campos para agregar una pregunta.{{/usuario.esEditor}}
+                    {{#usuario.esAdmin}}Completá todos los campos para agregar una pregunta.{{/usuario.esAdmin}}
+                    {{^usuario.esEditor}}{{^usuario.esAdmin}}Completá todos los campos para sugerir una pregunta.{{/usuario.esAdmin}}{{/usuario.esEditor}}
                 </p>
 
                 {{#error}}
@@ -79,12 +73,9 @@
                     </div>
                     <button type="submit"
                             class="w-full bg-[#00b582] font-bold text-lg px-10 py-3 rounded-full text-white transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg">
-                        {{#usuario.esEditor}}
-                        Guardar pregunta
-                        {{/usuario.esEditor}}
-                        {{^usuario.esEditor}}
-                        Enviar sugerencia
-                        {{/usuario.esEditor}}
+                        {{#usuario.esEditor}}Guardar pregunta{{/usuario.esEditor}}
+                        {{#usuario.esAdmin}}Guardar pregunta{{/usuario.esAdmin}}
+                        {{^usuario.esEditor}}{{^usuario.esAdmin}}Enviar sugerencia{{/usuario.esAdmin}}{{/usuario.esEditor}}
                     </button>
                 </form>
                 <div class="mt-6 text-center">

@@ -171,7 +171,7 @@ class PreguntaModel
 
     public function crear($categoriaId, $pregunta, $opcionA, $opcionB, $opcionC, $opcionD, $respuestaCorrecta, $creadorId = null, $rol = 'usuario')
     {
-        $activa = ($rol === 'editor') ? 1 : 0;
+        $activa = ($rol === 'editor' || $rol === 'admin') ? 1 : 0;
         $creador = $creadorId ?: 'NULL';
         $sql = "INSERT INTO preguntas (categoria_id, pregunta, opcion_a, opcion_b, opcion_c, opcion_d, respuesta_correcta, activa, creador_id)
                 VALUES ($categoriaId, '$pregunta', '$opcionA', '$opcionB', '$opcionC', '$opcionD', '$respuestaCorrecta', $activa, $creador)";

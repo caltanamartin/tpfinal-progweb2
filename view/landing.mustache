@@ -33,12 +33,9 @@
                 </a>
                 <a href="/pregunta/crear"
                    class="bg-white font-bold text-lg px-8 py-4 rounded-full text-gray-700 border-2 border-gray-300 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md hover:border-gray-400"> 
-                    {{#usuario.esEditor}}
-                    Crear pregunta
-                    {{/usuario.esEditor}}
-                    {{^usuario.esEditor}}
-                    Sugerir pregunta
-                    {{/usuario.esEditor}}
+                    {{#usuario.esEditor}}Crear pregunta{{/usuario.esEditor}}
+                    {{#usuario.esAdmin}}Crear pregunta{{/usuario.esAdmin}}
+                    {{^usuario.esEditor}}{{^usuario.esAdmin}}Sugerir pregunta{{/usuario.esAdmin}}{{/usuario.esEditor}}
                 </a>
             </div>
 
