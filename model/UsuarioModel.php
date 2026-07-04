@@ -62,17 +62,20 @@ class UsuarioModel
         return $this->database->execute($sql);
     }
 
-    public function getRanking($limite = 50)
+    public function getRanking($limite = 50, $rolFiltro = null)
     {
         $sql = "SELECT u.id, u.username, u.nombre, u.foto_perfil, u.rol,
                        IFNULL(SUM(p.puntaje), 0) AS puntaje_total,
                        COUNT(p.id) AS cantidad_partidas
                 FROM usuarios u
                 LEFT JOIN partidas p ON p.usuario_id = u.id AND p.estado = 'terminada'
-                WHERE u.verificado = 1
-                GROUP BY u.id
-                ORDER BY puntaje_total DESC
-                LIMIT $limite";
+                WHERE u.verificado = 1";
+        if ($rolFiltro === 'usuario') {
+            $sql .= " AND u.rol = 'usuario'";
+        }
+        $sql .= " GROUP BY u.id
+                  ORDER BY puntaje_total DESC
+                  LIMIT $limite";
         return $this->database->query($sql);
     }
 

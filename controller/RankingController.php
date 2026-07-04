@@ -13,7 +13,9 @@ class RankingController
 
     public function ver()
     {
-        $usuarios = $this->usuarioModel->getRanking(50);
+        $usuario = $_SESSION['usuario'] ?? null;
+        $rolFiltro = ($usuario && $usuario['rol'] === 'usuario') ? 'usuario' : null;
+        $usuarios = $this->usuarioModel->getRanking(50, $rolFiltro);
 
         $posicion = 1;
         foreach ($usuarios as &$u) {
@@ -22,7 +24,7 @@ class RankingController
 
         $data = [
             'usuarios' => $usuarios,
-            'usuario' => $_SESSION['usuario'] ?? null,
+            'usuario' => $usuario,
         ];
 
         $this->renderer->render("ranking", $data);
