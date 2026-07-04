@@ -4,11 +4,13 @@
 google.charts.load('current', { packages: ['corechart', 'bar', 'table'] });
 google.charts.setOnLoadCallback(function () {
     drawCharts();
-    setTimeout(function () {
-        var tab = location.hash.replace('#', '') || 'usuarios';
-        if (['usuarios', 'partidas', 'preguntas'].indexOf(tab) === -1) tab = 'usuarios';
-        showTab(tab);
-    }, 50);
+        setTimeout(function () {
+            var tab = location.hash.replace('#', '') || 'usuarios';
+            if (['usuarios', 'partidas', 'preguntas'].indexOf(tab) === -1) tab = 'usuarios';
+            showTab(tab);
+            var el = document.getElementById('tab-' + tab);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
 });
 
 function showTab(tab) {
@@ -184,10 +186,10 @@ function drawTablaPorcentajes() {
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 no-print">
             <h1 class="text-2xl font-bold text-gray-800">Panel de administración</h1>
             <div class="flex items-center gap-2">
-                <a href="/admin?filtro=dia" class="text-xs px-3 py-1.5 rounded-lg transition-colors {{#esDia}}bg-purple-600 text-white{{/esDia}}{{^esDia}}bg-gray-200 text-gray-700 hover:bg-gray-300{{/esDia}}">Día</a>
-                <a href="/admin?filtro=semana" class="text-xs px-3 py-1.5 rounded-lg transition-colors {{#esSemana}}bg-purple-600 text-white{{/esSemana}}{{^esSemana}}bg-gray-200 text-gray-700 hover:bg-gray-300{{/esSemana}}">Semana</a>
-                <a href="/admin?filtro=mes" class="text-xs px-3 py-1.5 rounded-lg transition-colors {{#esMes}}bg-purple-600 text-white{{/esMes}}{{^esMes}}bg-gray-200 text-gray-700 hover:bg-gray-300{{/esMes}}">Mes</a>
-                <a href="/admin?filtro=anio" class="text-xs px-3 py-1.5 rounded-lg transition-colors {{#esAnio}}bg-purple-600 text-white{{/esAnio}}{{^esAnio}}bg-gray-200 text-gray-700 hover:bg-gray-300{{/esAnio}}">Año</a>
+                <a href="javascript:" onclick="location.href='/admin?filtro=dia'+location.hash" class="text-xs px-3 py-1.5 rounded-lg transition-colors {{#esDia}}bg-purple-600 text-white{{/esDia}}{{^esDia}}bg-gray-200 text-gray-700 hover:bg-gray-300{{/esDia}}">Día</a>
+                <a href="javascript:" onclick="location.href='/admin?filtro=semana'+location.hash" class="text-xs px-3 py-1.5 rounded-lg transition-colors {{#esSemana}}bg-purple-600 text-white{{/esSemana}}{{^esSemana}}bg-gray-200 text-gray-700 hover:bg-gray-300{{/esSemana}}">Semana</a>
+                <a href="javascript:" onclick="location.href='/admin?filtro=mes'+location.hash" class="text-xs px-3 py-1.5 rounded-lg transition-colors {{#esMes}}bg-purple-600 text-white{{/esMes}}{{^esMes}}bg-gray-200 text-gray-700 hover:bg-gray-300{{/esMes}}">Mes</a>
+                <a href="javascript:" onclick="location.href='/admin?filtro=anio'+location.hash" class="text-xs px-3 py-1.5 rounded-lg transition-colors {{#esAnio}}bg-purple-600 text-white{{/esAnio}}{{^esAnio}}bg-gray-200 text-gray-700 hover:bg-gray-300{{/esAnio}}">Año</a>
                 <button onclick="window.print()" class="text-xs px-3 py-1.5 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors cursor-pointer">Imprimir</button>
             </div>
         </div>

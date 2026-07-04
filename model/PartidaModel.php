@@ -95,7 +95,7 @@ class PartidaModel
         }
     }
 
-    public function getTodas()
+    public function getTodas($pagina = null, $porPagina = null)
     {
         $sql = "SELECT p.*, u.username,
                        COUNT(pp.id) AS total_preguntas,
@@ -105,6 +105,13 @@ class PartidaModel
                 LEFT JOIN partidas_preguntas pp ON pp.partida_id = p.id
                 GROUP BY p.id
                 ORDER BY p.id DESC";
+        if ($pagina && $porPagina) {
+            $offset = ($pagina - 1) * $porPagina;
+            $countSql = "SELECT COUNT(*) AS total FROM (SELECT p.id FROM partidas p GROUP BY p.id) AS sub";
+            $total = $this->database->query($countSql)[0]['total'];
+            $sql .= " LIMIT $porPagina OFFSET $offset";
+            return ['filas' => $this->database->query($sql), 'total' => $total, 'paginas' => (int)ceil($total / $porPagina)];
+        }
         return $this->database->query($sql);
     }
 

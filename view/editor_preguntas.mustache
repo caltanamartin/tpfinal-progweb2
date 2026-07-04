@@ -129,6 +129,22 @@
                 </table>
             </div>
         </div>
+        {{#pag.mostrar}}
+        <div class="flex items-center justify-center gap-1 mt-4">
+            {{#pag.anterior}}
+            <a href="?{{pag.param}}={{pag.prevPage}}"
+               class="px-3 py-1.5 text-sm rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors">Anterior</a>
+            {{/pag.anterior}}
+            {{#pag.numeros}}
+            <a href="?{{pag.param}}={{num}}"
+               class="px-3 py-1.5 text-sm rounded-lg transition-colors {{#activa}}bg-purple-600 text-white{{/activa}}{{^activa}}bg-gray-200 text-gray-700 hover:bg-gray-300{{/activa}}">{{num}}</a>
+            {{/pag.numeros}}
+            {{#pag.siguiente}}
+            <a href="?{{pag.param}}={{pag.nextPage}}"
+               class="px-3 py-1.5 text-sm rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors">Siguiente</a>
+            {{/pag.siguiente}}
+        </div>
+        {{/pag.mostrar}}
     </div>
     {{>footer}}
 </div>

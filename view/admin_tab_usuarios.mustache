@@ -129,4 +129,20 @@
             </table>
         </div>
     </div>
+    {{#pagUsuarios.mostrar}}
+    <div class="flex items-center justify-center gap-1 mt-4 mb-6">
+        {{#pagUsuarios.anterior}}
+        <a href="?{{pagUsuarios.param}}={{pagUsuarios.prevPage}}{{#pagUsuarios.hash}}#{{pagUsuarios.hash}}{{/pagUsuarios.hash}}"
+           class="px-3 py-1.5 text-sm rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors">Anterior</a>
+        {{/pagUsuarios.anterior}}
+        {{#pagUsuarios.numeros}}
+        <a href="?{{pagUsuarios.param}}={{num}}{{#pagUsuarios.hash}}#{{pagUsuarios.hash}}{{/pagUsuarios.hash}}"
+           class="px-3 py-1.5 text-sm rounded-lg transition-colors {{#activa}}bg-purple-600 text-white{{/activa}}{{^activa}}bg-gray-200 text-gray-700 hover:bg-gray-300{{/activa}}">{{num}}</a>
+        {{/pagUsuarios.numeros}}
+        {{#pagUsuarios.siguiente}}
+        <a href="?{{pagUsuarios.param}}={{pagUsuarios.nextPage}}{{#pagUsuarios.hash}}#{{pagUsuarios.hash}}{{/pagUsuarios.hash}}"
+           class="px-3 py-1.5 text-sm rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors">Siguiente</a>
+        {{/pagUsuarios.siguiente}}
+    </div>
+    {{/pagUsuarios.mostrar}}
 </div>

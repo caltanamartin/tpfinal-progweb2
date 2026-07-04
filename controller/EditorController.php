@@ -35,6 +35,27 @@ class EditorController
         return $usuario;
     }
 
+    private function buildPaginacion($actual, $totalPaginas, $param, $hash)
+    {
+        $numeros = [];
+        $inicio = max(1, $actual - 2);
+        $fin = min($totalPaginas, $actual + 2);
+        for ($i = $inicio; $i <= $fin; $i++) {
+            $numeros[] = ['num' => $i, 'activa' => $i === $actual];
+        }
+        return [
+            'mostrar' => $totalPaginas > 1,
+            'actual' => $actual,
+            'anterior' => $actual > 1,
+            'siguiente' => $actual < $totalPaginas,
+            'prevPage' => $actual - 1,
+            'nextPage' => $actual + 1,
+            'numeros' => $numeros,
+            'param' => $param,
+            'hash' => $hash,
+        ];
+    }
+
     private function backUrl($usuario)
     {
         return ($usuario['rol'] === 'admin') ? '/admin#preguntas' : '/editor/preguntas';
@@ -58,7 +79,10 @@ class EditorController
         $usuario = $this->verificarEditorOAdmin();
         if (!$usuario) return;
 
-        $preguntas = $this->preguntaModel->listarTodas();
+        $porPagina = 15;
+        $page = max(1, (int)$this->request->get('page', 1));
+        $res = $this->preguntaModel->listarTodas($page, $porPagina);
+        $preguntas = $res['filas'];
         foreach ($preguntas as &$p) {
             $p['esCorrectaA'] = ($p['respuesta_correcta'] === 'A');
             $p['esCorrectaB'] = ($p['respuesta_correcta'] === 'B');
@@ -72,6 +96,7 @@ class EditorController
             'esAdmin' => ($usuario['rol'] === 'admin'),
             'preguntas' => $preguntas,
             'backUrl' => $this->backUrl($usuario),
+            'pag' => $this->buildPaginacion($page, $res['paginas'], 'page', ''),
         ];
 
         $this->renderer->render('editor_preguntas', $data);
@@ -201,7 +226,9 @@ class EditorController
         $usuario = $this->verificarEditorOAdmin();
         if (!$usuario) return;
 
-        $reportes = $this->preguntaModel->listarReportes();
+        $porPagina = 15;
+        $page = max(1, (int)$this->request->get('page', 1));
+        $res = $this->preguntaModel->listarReportes($page, $porPagina);
 
         $exito = $_SESSION['exito_editor'] ?? null;
         unset($_SESSION['exito_editor']);
@@ -209,8 +236,9 @@ class EditorController
         $data = [
             'usuario' => $usuario,
             'esEditor' => true,
-            'reportes' => $reportes,
+            'reportes' => $res['filas'],
             'exito' => $exito,
+            'pag' => $this->buildPaginacion($page, $res['paginas'], 'page', ''),
         ];
 
         $this->renderer->render('editor_reportes', $data);
@@ -265,7 +293,10 @@ class EditorController
         $usuario = $this->verificarEditorOAdmin();
         if (!$usuario) return;
 
-        $pendientes = $this->preguntaModel->listarPendientes();
+        $porPagina = 15;
+        $page = max(1, (int)$this->request->get('page', 1));
+        $res = $this->preguntaModel->listarPendientes($page, $porPagina);
+        $pendientes = $res['filas'];
         foreach ($pendientes as &$p) {
             $p['esCorrectaA'] = ($p['respuesta_correcta'] === 'A');
             $p['esCorrectaB'] = ($p['respuesta_correcta'] === 'B');
@@ -281,6 +312,7 @@ class EditorController
             'esEditor' => true,
             'pendientes' => $pendientes,
             'exito' => $exito,
+            'pag' => $this->buildPaginacion($page, $res['paginas'], 'page', ''),
         ];
 
         $this->renderer->render('editor_pendientes', $data);

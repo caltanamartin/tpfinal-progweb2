@@ -53,12 +53,19 @@ class AdminController
         $usuariosPorEdad = $this->usuarioModel->getUsuariosPorEdad($filtro);
         $porcentajeCorrectas = $this->usuarioModel->getPorcentajeCorrectasPorUsuario($filtro);
 
-        $exito = $_SESSION['exito_editor'] ?? null;
-        unset($_SESSION['exito_editor']);
+        $porPagina = 10;
 
-        $todosUsuarios = $this->usuarioModel->getAll();
-        $todasPartidas = $this->partidaModel->getTodas();
-        $todasPreguntas = $this->preguntaModel->listarTodas();
+        $pageU = max(1, (int)$this->request->get('page_usuarios', 1));
+        $pageP = max(1, (int)$this->request->get('page_partidas', 1));
+        $pageQ = max(1, (int)$this->request->get('page_preguntas', 1));
+
+        $usuariosRes = $this->usuarioModel->getAll($pageU, $porPagina);
+        $partidasRes = $this->partidaModel->getTodas($pageP, $porPagina);
+        $preguntasRes = $this->preguntaModel->listarTodas($pageQ, $porPagina);
+
+        $todosUsuarios = $usuariosRes['filas'];
+        $todasPartidas = $partidasRes['filas'];
+        $todasPreguntas = $preguntasRes['filas'];
 
         foreach ($todosUsuarios as &$u) {
             $u['verificadoSi'] = $u['verificado'] ? 'Sí' : 'No';
@@ -109,9 +116,33 @@ class AdminController
             'todosUsuarios' => $todosUsuarios,
             'todasPartidas' => $todasPartidas,
             'todasPreguntas' => $todasPreguntas,
+            'pagUsuarios' => $this->buildPaginacion($pageU, $usuariosRes['paginas'], 'page_usuarios', 'usuarios'),
+            'pagPartidas' => $this->buildPaginacion($pageP, $partidasRes['paginas'], 'page_partidas', 'partidas'),
+            'pagPreguntas' => $this->buildPaginacion($pageQ, $preguntasRes['paginas'], 'page_preguntas', 'preguntas'),
         ];
 
         $this->renderer->render('admin_index', $data);
+    }
+
+    private function buildPaginacion($actual, $totalPaginas, $param, $hash)
+    {
+        $numeros = [];
+        $inicio = max(1, $actual - 2);
+        $fin = min($totalPaginas, $actual + 2);
+        for ($i = $inicio; $i <= $fin; $i++) {
+            $numeros[] = ['num' => $i, 'activa' => $i === $actual];
+        }
+        return [
+            'mostrar' => $totalPaginas > 1,
+            'actual' => $actual,
+            'anterior' => $actual > 1,
+            'siguiente' => $actual < $totalPaginas,
+            'prevPage' => $actual - 1,
+            'nextPage' => $actual + 1,
+            'numeros' => $numeros,
+            'param' => $param,
+            'hash' => $hash,
+        ];
     }
 
     private function combinarSeries($usuarios, $partidas)

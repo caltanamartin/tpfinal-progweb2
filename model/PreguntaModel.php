@@ -178,7 +178,7 @@ class PreguntaModel
         return $this->database->execute($sql);
     }
 
-    public function listarTodas()
+    public function listarTodas($pagina = null, $porPagina = null)
     {
         $sql = "SELECT p.*, c.nombre AS categoria_nombre, c.color AS categoria_color,
                        u.username AS creador_username
@@ -186,6 +186,12 @@ class PreguntaModel
                 JOIN categorias c ON c.id = p.categoria_id
                 LEFT JOIN usuarios u ON u.id = p.creador_id
                 ORDER BY p.id DESC";
+        if ($pagina && $porPagina) {
+            $offset = ($pagina - 1) * $porPagina;
+            $total = $this->database->query("SELECT COUNT(*) AS total FROM preguntas")[0]['total'];
+            $sql .= " LIMIT $porPagina OFFSET $offset";
+            return ['filas' => $this->database->query($sql), 'total' => $total, 'paginas' => (int)ceil($total / $porPagina)];
+        }
         return $this->database->query($sql);
     }
 
@@ -215,7 +221,7 @@ class PreguntaModel
         return $this->database->execute($sql);
     }
 
-    public function listarReportes()
+    public function listarReportes($pagina = null, $porPagina = null)
     {
         $sql = "SELECT rp.*, p.pregunta AS pregunta_texto, u.username AS reportado_por
                 FROM reportes_preguntas rp
@@ -223,6 +229,12 @@ class PreguntaModel
                 JOIN usuarios u ON u.id = rp.usuario_id
                 WHERE rp.accion IS NULL
                 ORDER BY rp.creado_en DESC";
+        if ($pagina && $porPagina) {
+            $offset = ($pagina - 1) * $porPagina;
+            $total = $this->database->query("SELECT COUNT(*) AS total FROM reportes_preguntas WHERE accion IS NULL")[0]['total'];
+            $sql .= " LIMIT $porPagina OFFSET $offset";
+            return ['filas' => $this->database->query($sql), 'total' => $total, 'paginas' => (int)ceil($total / $porPagina)];
+        }
         return $this->database->query($sql);
     }
 
@@ -232,7 +244,7 @@ class PreguntaModel
         return $this->database->execute($sql);
     }
 
-    public function listarPendientes()
+    public function listarPendientes($pagina = null, $porPagina = null)
     {
         $sql = "SELECT p.*, c.nombre AS categoria_nombre, c.color AS categoria_color, u.username AS creador_username
                 FROM preguntas p
@@ -240,6 +252,12 @@ class PreguntaModel
                 LEFT JOIN usuarios u ON u.id = p.creador_id
                 WHERE p.activa = 0 AND p.revisada_por IS NULL
                 ORDER BY p.creado_en DESC";
+        if ($pagina && $porPagina) {
+            $offset = ($pagina - 1) * $porPagina;
+            $total = $this->database->query("SELECT COUNT(*) AS total FROM preguntas WHERE activa = 0 AND revisada_por IS NULL")[0]['total'];
+            $sql .= " LIMIT $porPagina OFFSET $offset";
+            return ['filas' => $this->database->query($sql), 'total' => $total, 'paginas' => (int)ceil($total / $porPagina)];
+        }
         return $this->database->query($sql);
     }
 

@@ -176,9 +176,15 @@ class UsuarioModel
         }
     }
 
-    public function getAll()
+    public function getAll($pagina = null, $porPagina = null)
     {
         $sql = "SELECT id, email, nombre, username, anio_nacimiento, sexo, pais, ciudad, foto_perfil, verificado, rol, creado_en FROM usuarios ORDER BY id";
+        if ($pagina && $porPagina) {
+            $offset = ($pagina - 1) * $porPagina;
+            $sql .= " LIMIT $porPagina OFFSET $offset";
+            $total = $this->database->query("SELECT COUNT(*) AS total FROM usuarios")[0]['total'];
+            return ['filas' => $this->database->query($sql), 'total' => $total, 'paginas' => (int)ceil($total / $porPagina)];
+        }
         return $this->database->query($sql);
     }
 
