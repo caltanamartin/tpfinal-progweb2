@@ -235,7 +235,7 @@ class EditorController
 
         $data = [
             'usuario' => $usuario,
-            'esEditor' => true,
+            'esEditor' => ($usuario['rol'] === 'editor'),
             'reportes' => $res['filas'],
             'exito' => $exito,
             'pag' => $this->buildPaginacion($page, $res['paginas'], 'page', ''),
@@ -309,7 +309,7 @@ class EditorController
 
         $data = [
             'usuario' => $usuario,
-            'esEditor' => true,
+            'esEditor' => ($usuario['rol'] === 'editor'),
             'pendientes' => $pendientes,
             'exito' => $exito,
             'pag' => $this->buildPaginacion($page, $res['paginas'], 'page', ''),

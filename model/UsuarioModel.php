@@ -11,7 +11,9 @@ class UsuarioModel
 
     public function getByUsername($username)
     {
-        $sql = "SELECT * FROM usuarios WHERE username = ?";
+        $sql = "SELECT id, email, nombre, username, anio_nacimiento, sexo, pais, ciudad,
+                       foto_perfil, verificado, token_verificacion, rol, creado_en
+                FROM usuarios WHERE username = ?";
         $result = $this->database->queryPrepared($sql, [$username]);
         return !empty($result) ? $result[0] : null;
     }

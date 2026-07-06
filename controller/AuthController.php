@@ -37,6 +37,7 @@ class AuthController
                 if (!$usuario['verificado']) {
                     $data['error'] = "Tenés que verificar tu cuenta por email antes de iniciar sesión.";
                 } else {
+                    session_regenerate_id(true);
                     $_SESSION['usuario'] = $usuario;
                     $_SESSION['usuario']['esEditor'] = ($usuario['rol'] === 'editor');
                     $_SESSION['usuario']['esAdmin'] = ($usuario['rol'] === 'admin');
