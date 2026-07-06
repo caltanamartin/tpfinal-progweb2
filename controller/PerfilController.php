@@ -42,6 +42,8 @@ class PerfilController
             Redirect::to('/login');
         }
 
+        $data = [];
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $campos = [
                 'email' => $this->request->post('email'),
@@ -60,11 +62,18 @@ class PerfilController
             }
 
             if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {
-                $ext = pathinfo($_FILES['foto_perfil']['name'], PATHINFO_EXTENSION);
-                $nombreArchivo = uniqid('perfil_') . '.' . $ext;
-                $ruta = __DIR__ . '/../uploads/perfiles/' . $nombreArchivo;
-                if (move_uploaded_file($_FILES['foto_perfil']['tmp_name'], $ruta)) {
-                    $cambios['foto_perfil'] = 'uploads/perfiles/' . $nombreArchivo;
+                $ext = strtolower(pathinfo($_FILES['foto_perfil']['name'], PATHINFO_EXTENSION));
+                $extPermitidas = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                if (!in_array($ext, $extPermitidas)) {
+                    $data['error'] = "Formato de imagen no válido. Permitidos: " . implode(', ', $extPermitidas);
+                } elseif ($_FILES['foto_perfil']['size'] > 2 * 1024 * 1024) {
+                    $data['error'] = "La imagen supera el tamaño máximo de 2MB.";
+                } else {
+                    $nombreArchivo = uniqid('perfil_') . '.' . $ext;
+                    $ruta = __DIR__ . '/../uploads/perfiles/' . $nombreArchivo;
+                    if (move_uploaded_file($_FILES['foto_perfil']['tmp_name'], $ruta)) {
+                        $cambios['foto_perfil'] = 'uploads/perfiles/' . $nombreArchivo;
+                    }
                 }
             }
 
@@ -75,9 +84,13 @@ class PerfilController
                 $_SESSION['usuario']['esAdmin'] = ($_SESSION['usuario']['rol'] ?? 'usuario') === 'admin';
             }
 
-            Redirect::to('/perfil');
+            if (!isset($data['error'])) {
+                Redirect::to('/perfil');
+            }
         }
 
+        $data['error'] = $data['error'] ?? null;
+        $data['usuario'] = $usuario;
         $usuario['sexoMasculino'] = $usuario['sexo'] === 'Masculino';
         $usuario['sexoFemenino'] = $usuario['sexo'] === 'Femenino';
         $usuario['sexoOtro'] = !$usuario['sexoMasculino'] && !$usuario['sexoFemenino'];
@@ -85,6 +98,7 @@ class PerfilController
         $this->renderer->render("formEditarPerfilView", [
             "usuario" => $usuario,
             "esPerfil" => true,
+            "error" => $data['error'],
         ]);
     }
 

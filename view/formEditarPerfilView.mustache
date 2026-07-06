@@ -4,6 +4,9 @@
         <div class="w-full max-w-md">
             <div class="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
                 <form method="POST" enctype="multipart/form-data">
+                    {{#error}}
+                    <p class="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">{{error}}</p>
+                    {{/error}}
                     <div class="flex flex-col items-center mb-6">
                         <label for="foto_perfil" class="relative group cursor-pointer mb-4">
                             <img id="preview_foto" alt="Foto de perfil"

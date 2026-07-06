@@ -74,32 +74,41 @@ class AuthController
             } else {
                 $fotoPerfil = '';
                 if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {
-                    $ext = pathinfo($_FILES['foto_perfil']['name'], PATHINFO_EXTENSION);
-                    $nombreArchivo = uniqid('perfil_') . '.' . $ext;
-                    $ruta = __DIR__ . '/../uploads/perfiles/' . $nombreArchivo;
-                    if (move_uploaded_file($_FILES['foto_perfil']['tmp_name'], $ruta)) {
-                        $fotoPerfil = 'uploads/perfiles/' . $nombreArchivo;
+                    $ext = strtolower(pathinfo($_FILES['foto_perfil']['name'], PATHINFO_EXTENSION));
+                    $extPermitidas = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                    if (!in_array($ext, $extPermitidas)) {
+                        $data['error'] = "Formato de imagen no válido. Permitidos: " . implode(', ', $extPermitidas);
+                    } elseif ($_FILES['foto_perfil']['size'] > 2 * 1024 * 1024) {
+                        $data['error'] = "La imagen supera el tamaño máximo de 2MB.";
+                    } else {
+                        $nombreArchivo = uniqid('perfil_') . '.' . $ext;
+                        $ruta = __DIR__ . '/../uploads/perfiles/' . $nombreArchivo;
+                        if (move_uploaded_file($_FILES['foto_perfil']['tmp_name'], $ruta)) {
+                            $fotoPerfil = 'uploads/perfiles/' . $nombreArchivo;
+                        }
                     }
                 }
 
-                $this->model->crear($email, $nombre, $username, $password, $anioNacimiento, $sexo, $pais, $ciudad, $fotoPerfil);
-                $usuario = $this->model->getByUsername($username);
-                $token = bin2hex(random_bytes(32));
-                $this->model->saveToken($usuario['id'], $token);
+                if (!isset($data['error'])) {
+                    $this->model->crear($email, $nombre, $username, $password, $anioNacimiento, $sexo, $pais, $ciudad, $fotoPerfil);
+                    $usuario = $this->model->getByUsername($username);
+                    $token = bin2hex(random_bytes(32));
+                    $this->model->saveToken($usuario['id'], $token);
 
-                $baseUrl = (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'];
-                $link = $baseUrl . '/verificar/' . $token;
+                    $baseUrl = (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'];
+                    $link = $baseUrl . '/verificar/' . $token;
 
-                $subject = "Verificá tu cuenta en PreguntaTres";
-                $body = "<h1>Bienvenido a PreguntaTres</h1>
-                         <p>Hacé clic en el siguiente enlace para verificar tu cuenta:</p>
-                         <p><a href=\"$link\">$link</a></p>
-                         <p>Si no te registraste, ignorá este mensaje.</p>";
+                    $subject = "Verificá tu cuenta en PreguntaTres";
+                    $body = "<h1>Bienvenido a PreguntaTres</h1>
+                             <p>Hacé clic en el siguiente enlace para verificar tu cuenta:</p>
+                             <p><a href=\"$link\">$link</a></p>
+                             <p>Si no te registraste, ignorá este mensaje.</p>";
 
-                Mailer::send($email, $subject, $body);
+                    Mailer::send($email, $subject, $body);
 
-                $_SESSION['exito'] = "Registrado correctamente. Revisá tu email para verificar la cuenta.";
-                Redirect::to('/login');
+                    $_SESSION['exito'] = "Registrado correctamente. Revisá tu email para verificar la cuenta.";
+                    Redirect::to('/login');
+                }
             }
         }
 
