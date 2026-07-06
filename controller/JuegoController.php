@@ -41,6 +41,9 @@ class JuegoController
         }
 
         $partidaId = $_REQUEST['id'] ?? null;
+        if (!Validator::positiveInt($partidaId)) {
+            Redirect::to('/');
+        }
         $partida = $this->partidaModel->obtener($partidaId);
 
         if (!$partida || $partida['usuario_id'] != $usuario['id']) {
@@ -85,6 +88,9 @@ class JuegoController
         }
 
         $partidaId = $this->request->get('id');
+        if (!Validator::positiveInt($partidaId)) {
+            Redirect::to('/');
+        }
         $partida = $this->partidaModel->obtener($partidaId);
 
         if (!$partida || $partida['usuario_id'] != $usuario['id']) { 
@@ -308,6 +314,11 @@ class JuegoController
         }
 
         $preguntaId = $this->request->post('pregunta_id');
+
+        if (!Validator::positiveInt($preguntaId)) {
+            Redirect::to('/');
+        }
+
         $motivo = $this->request->post('motivo');
 
         if (!$preguntaId) {
@@ -333,6 +344,9 @@ class JuegoController
         }
 
         $partidaId = $this->request->get('id');
+        if (!Validator::positiveInt($partidaId)) {
+            Redirect::to('/');
+        }
         $partida = $this->partidaModel->obtener($partidaId);
 
         if (!$partida || $partida['usuario_id'] != $usuario['id']) {

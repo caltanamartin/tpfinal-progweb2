@@ -108,7 +108,7 @@ class EditorController
         if (!$usuario) return;
 
         $id = $this->request->get('id');
-        if (!$id) {
+        if (!Validator::positiveInt($id)) {
             Redirect::to($this->backUrl($usuario));
         }
 
@@ -164,7 +164,7 @@ class EditorController
 
         $backUrl = $this->backUrl($usuario);
 
-        if (!$id || !$categoriaId || !$pregunta || !$opcionA || !$opcionB || !$opcionC || !$opcionD || !$respuestaCorrecta) {
+        if (!Validator::positiveInt($id) || !$categoriaId || !$pregunta || !$opcionA || !$opcionB || !$opcionC || !$opcionD || !$respuestaCorrecta) {
             $_SESSION['error_editor'] = 'Completá todos los campos.';
             Redirect::to('/editor/preguntas/editar?id=' . $id);
         }
@@ -193,7 +193,7 @@ class EditorController
         }
 
         $id = $this->request->post('id');
-        if (!$id) {
+        if (!Validator::positiveInt($id)) {
             Redirect::to($this->backUrl($usuario));
         }
 
@@ -212,7 +212,7 @@ class EditorController
         }
 
         $id = $this->request->post('id');
-        if (!$id) {
+        if (!Validator::positiveInt($id)) {
             Redirect::to($this->backUrl($usuario));
         }
 
@@ -256,7 +256,7 @@ class EditorController
         $reporteId = $this->request->post('reporte_id');
         $preguntaId = $this->request->post('pregunta_id');
 
-        if (!$reporteId || !$preguntaId) {
+        if (!Validator::positiveInt($reporteId) || !Validator::positiveInt($preguntaId)) {
             Redirect::to('/editor/reportes');
         }
 
@@ -278,7 +278,7 @@ class EditorController
 
         $reporteId = $this->request->post('reporte_id');
 
-        if (!$reporteId) {
+        if (!Validator::positiveInt($reporteId)) {
             Redirect::to('/editor/reportes');
         }
 
@@ -328,7 +328,7 @@ class EditorController
         }
 
         $id = $this->request->post('id');
-        if (!$id) {
+        if (!Validator::positiveInt($id)) {
             Redirect::to('/editor/pendientes');
         }
 
@@ -347,7 +347,7 @@ class EditorController
         }
 
         $id = $this->request->post('id');
-        if (!$id) {
+        if (!Validator::positiveInt($id)) {
             Redirect::to('/editor/pendientes');
         }
 

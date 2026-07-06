@@ -111,6 +111,9 @@ class PerfilController
     public function verPublico()
     {
         $id = $this->request->get('id');
+        if (!Validator::positiveInt($id)) {
+            Redirect::to('/ranking');
+        }
         $usuario = $this->model->getUsuarioConEstadisticas($id);
 
         if (!$usuario) {

@@ -15,9 +15,15 @@ class Router
 
     public function dispatch($controller, $method)
     {
-        $controller = $this->getController($controller);
-        $method     = $this->getMethod($controller, $method);
-        $controller->{$method}();
+        try {
+            $controller = $this->getController($controller);
+            $method     = $this->getMethod($controller, $method);
+            $controller->{$method}();
+        } catch (Throwable $e) {
+            Log::error($e->getMessage());
+            http_response_code(500);
+            echo "Error interno del servidor.";
+        }
     }
 
     private function getController($controller)

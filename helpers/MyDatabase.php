@@ -7,6 +7,9 @@ class MyDatabase
     public function __construct($hostname, $username, $password, $database)
     {
         $this->conexion = new mysqli($hostname, $username, $password, $database);
+        if ($this->conexion->connect_error) {
+            throw new RuntimeException("Error de conexión a la base de datos.");
+        }
         $this->conexion->set_charset("utf8mb4");
     }
 
@@ -36,7 +39,7 @@ class MyDatabase
     {
         $stmt = $this->conexion->prepare($sql);
         if (!$stmt) {
-            return false;
+            throw new RuntimeException("Error preparando consulta: " . $this->conexion->error);
         }
         if (!empty($params)) {
             $types = '';
@@ -46,6 +49,9 @@ class MyDatabase
             $stmt->bind_param($types, ...$params);
         }
         $stmt->execute();
+        if ($stmt->error) {
+            throw new RuntimeException("Error ejecutando consulta: " . $stmt->error);
+        }
         $affected = $stmt->affected_rows;
         $stmt->close();
         return $affected;
@@ -55,7 +61,7 @@ class MyDatabase
     {
         $stmt = $this->conexion->prepare($sql);
         if (!$stmt) {
-            return [];
+            throw new RuntimeException("Error preparando consulta: " . $this->conexion->error);
         }
         if (!empty($params)) {
             $types = '';
@@ -65,6 +71,9 @@ class MyDatabase
             $stmt->bind_param($types, ...$params);
         }
         $stmt->execute();
+        if ($stmt->error) {
+            throw new RuntimeException("Error ejecutando consulta: " . $stmt->error);
+        }
         $result = $stmt->get_result();
         $rows = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
         $stmt->close();
