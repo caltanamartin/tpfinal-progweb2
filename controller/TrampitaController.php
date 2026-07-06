@@ -96,6 +96,14 @@ class TrampitaController
                 $anio = (int)$parts[1];
                 if ($mes < 1 || $mes > 12) {
                     $errores[] = 'Mes de expiración inválido.';
+                } else {
+                    $anioCompleto = 2000 + $anio;
+                    $ahora = new DateTime();
+                    $vencimiento = new DateTime("{$anioCompleto}-{$mes}-01");
+                    $vencimiento->modify('last day of this month');
+                    if ($vencimiento < $ahora) {
+                        $errores[] = 'La tarjeta está vencida.';
+                    }
                 }
             }
 
@@ -229,7 +237,7 @@ class TrampitaController
         }
 
         $page = max(1, (int)$this->request->get('page', 1));
-        $porPagina = 20;
+        $porPagina = 10;
         $offset = ($page - 1) * $porPagina;
 
         $tipoFiltro = $this->request->get('tipo');
