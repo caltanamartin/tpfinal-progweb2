@@ -6,15 +6,17 @@ class JuegoController
     private $partidaModel;
     private $preguntaModel;
     private $partidaPreguntaModel;
+    private $trampitaModel;
     private $request;
 
-    public function __construct($renderer, $partidaModel, $preguntaModel, $partidaPreguntaModel, $request)
+    public function __construct($renderer, $partidaModel, $preguntaModel, $partidaPreguntaModel, $request, $trampitaModel = null)
     {
         $this->renderer = $renderer;
         $this->partidaModel = $partidaModel;
         $this->preguntaModel = $preguntaModel;
         $this->partidaPreguntaModel = $partidaPreguntaModel;
         $this->request = $request;
+        $this->trampitaModel = $trampitaModel;
     }
 
     public function nuevaPartida()
@@ -161,6 +163,30 @@ class JuegoController
             $pregunta['dificultad_label'] = 'Periodo de prueba';
         }
 
+        $ocultarOpciones = $_SESSION['ocultar_opciones'] ?? null;
+        unset($_SESSION['ocultar_opciones']);
+        if ($ocultarOpciones) {
+            foreach ($pregunta['opciones'] as &$opcion) {
+                if (in_array($opcion['letra'], $ocultarOpciones)) {
+                    $opcion['oculta'] = true;
+                }
+            }
+            unset($opcion);
+        }
+
+        $stockTrampitas = ['c_5050' => 0, 'c_skip' => 0, 'c_freeze' => 0];
+        $totalTrampitas = 0;
+        if ($this->trampitaModel) {
+            $stockRaw = $this->trampitaModel->contarDisponibles($usuario['id']);
+            $stockTrampitas = [
+                'c_5050' => $stockRaw['50/50'],
+                'c_skip' => $stockRaw['skip'],
+                'c_freeze' => $stockRaw['congelar_tiempo'],
+            ];
+            $totalTrampitas = $stockRaw['50/50'] + $stockRaw['skip'] + $stockRaw['congelar_tiempo'];
+        }
+        $tieneTrampitas = $totalTrampitas > 0;
+
         $exito = $_SESSION['reportado_exito'] ?? null;
         unset($_SESSION['reportado_exito']);
 
@@ -171,6 +197,8 @@ class JuegoController
             'tiempo_restante' => $tiempoRestante,
             'esJuego' => true,
             'exito' => $exito,
+            'stockTrampitas' => $stockTrampitas,
+            'tieneTrampitas' => $tieneTrampitas,
         ];
 
         $this->renderer->render('juego', $data);

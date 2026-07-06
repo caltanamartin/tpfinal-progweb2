@@ -14,7 +14,7 @@ class Configurator {
     }
 
     public function getHomeController() {
-        return new HomeController($this->getRenderer(), $this->getPartidaModel(), $this->getPreguntaModel());
+        return new HomeController($this->getRenderer(), $this->getPartidaModel(), $this->getPreguntaModel(), $this->getTrampitaModel());
     }
 
     public function getRankingController() {
@@ -43,6 +43,17 @@ class Configurator {
         );
     }
 
+    public function getTrampitaController() {
+        return new TrampitaController(
+            $this->getRenderer(),
+            $this->getTrampitaModel(),
+            $this->getPartidaModel(),
+            $this->getPartidaPreguntaModel(),
+            $this->getPreguntaModel(),
+            new Request()
+        );
+    }
+
     public function getEditorController() {
         return new EditorController(
             $this->getRenderer(),
@@ -58,7 +69,8 @@ class Configurator {
             $this->getPartidaModel(),
             $this->getPreguntaModel(),
             $this->getPartidaPreguntaModel(),
-            new Request()
+            new Request(),
+            $this->getTrampitaModel()
         );
     }
 
@@ -90,6 +102,11 @@ class Configurator {
     private function getPartidaModel()
     {
         return new PartidaModel($this->getDatabase());
+    }
+
+    private function getTrampitaModel()
+    {
+        return new TrampitaModel($this->getDatabase());
     }
 
     private function getPreguntaModel()

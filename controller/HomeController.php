@@ -5,12 +5,14 @@ class HomeController
     private $renderer;
     private $partidaModel;
     private $preguntaModel;
+    private $trampitaModel;
 
-    public function __construct($renderer, $partidaModel = null, $preguntaModel = null)
+    public function __construct($renderer, $partidaModel = null, $preguntaModel = null, $trampitaModel = null)
     {
         $this->renderer = $renderer;
         $this->partidaModel = $partidaModel;
         $this->preguntaModel = $preguntaModel;
+        $this->trampitaModel = $trampitaModel;
     }
 
     public function ver()
@@ -42,6 +44,16 @@ class HomeController
                     $data['nivelLabel'] = 'Intermedio';
                     $data['nivelClass'] = 'bg-yellow-100 text-yellow-700';
                 }
+            }
+
+            if ($this->trampitaModel) {
+                $stock = $this->trampitaModel->contarDisponibles($usuario['id']);
+                $data['stock'] = [
+                    'c_5050' => $stock['50/50'],
+                    'c_skip' => $stock['skip'],
+                    'c_freeze' => $stock['congelar_tiempo'],
+                ];
+                $data['tieneStock'] = ($stock['50/50'] + $stock['skip'] + $stock['congelar_tiempo']) > 0;
             }
         } elseif ($usuario) {
             $data["usuario"] = $usuario;

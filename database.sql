@@ -95,6 +95,17 @@ CREATE TABLE aldea_vikinga.reportes_preguntas (
     FOREIGN KEY (resuelto_por) REFERENCES usuarios(id)
 );
 
+CREATE TABLE aldea_vikinga.trampitas_compradas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    tipo ENUM('50/50','skip','congelar_tiempo') NOT NULL,
+    estado ENUM('disponible','usado') DEFAULT 'disponible',
+    comprada_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    usada_en TIMESTAMP NULL,
+    partida_id INT NULL,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+);
+
 INSERT INTO aldea_vikinga.categorias (nombre, color) VALUES
 ('Historia', '#f74114'),
 ('Deportes', '#007ca6'),

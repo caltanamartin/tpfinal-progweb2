@@ -40,6 +40,11 @@ RewriteRule ^editor/pendientes$           index.php?controller=editor&method=pen
 RewriteRule ^editor/pendientes/aprobar$   index.php?controller=editor&method=aprobarPendiente [L,QSA]
 RewriteRule ^editor/pendientes/rechazar$  index.php?controller=editor&method=rechazarPendiente [L,QSA]
 
+RewriteRule ^trampitas$                   index.php?controller=trampita&method=index [L,QSA]
+RewriteRule ^trampitas/comprar$           index.php?controller=trampita&method=comprar [L,QSA]
+RewriteRule ^trampitas/usar$              index.php?controller=trampita&method=usar [L,QSA]
+RewriteRule ^admin/trampitas$             index.php?controller=trampita&method=adminListar [L,QSA]
+
 RewriteRule ^admin$              index.php?controller=admin&method=index [L,QSA]
 
 RewriteRule ^ranking$            index.php?controller=ranking&method=ver [L,QSA]
