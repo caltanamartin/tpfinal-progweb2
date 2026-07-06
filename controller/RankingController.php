@@ -19,7 +19,9 @@ class RankingController
 
         $posicion = 1;
         foreach ($usuarios as &$u) {
-            $u['posicion'] = $posicion++;
+            $u['posicion'] = $posicion;
+            $u['esPrimero'] = $posicion === 1;
+            $posicion++;
         }
 
         $data = [

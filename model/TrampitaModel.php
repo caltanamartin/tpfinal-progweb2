@@ -107,12 +107,18 @@ class TrampitaModel
         $porTipo = [];
 
         foreach ($this->precios as $tipo => $precio) {
+            $es5050 = $tipo === '50/50';
+            $esSkip = $tipo === 'skip';
+            $esFreeze = $tipo === 'congelar_tiempo';
             $porTipo[$tipo] = [
                 'tipo' => $tipo,
                 'nombre' => $this->nombres[$tipo],
                 'precio' => $precio,
                 'cantidad' => 0,
                 'recaudado' => 0,
+                'es5050' => $es5050,
+                'esSkip' => $esSkip,
+                'esFreeze' => $esFreeze,
             ];
         }
 

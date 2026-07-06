@@ -27,14 +27,21 @@
             {{/exito_pregunta}}
 
             {{#tieneStock}}
-            <div class="flex justify-center gap-4 mb-5">
+            <div class="flex justify-center mb-5">
                 <a href="/trampitas"
-                   class="inline-flex items-center gap-2 text-xs font-medium bg-gray-100 text-gray-600 px-4 py-2 rounded-full hover:bg-gray-200 transition-colors">
-                    <span>50/50 {{stock.c_5050}}</span>
-                    <span class="text-gray-300">|</span>
-                    <span><i class="fas fa-forward-step"></i> {{stock.c_skip}}</span>
-                    <span class="text-gray-300">|</span>
-                    <span><i class="fas fa-snowflake"></i> {{stock.c_freeze}}</span>
+                   class="inline-flex items-center gap-6 text-xs font-medium bg-gray-100 text-gray-600 px-6 py-3 rounded-full hover:bg-gray-200 transition-colors">
+                    <div class="text-center">
+                        <div><i class="fas fa-bomb"></i></div>
+                        <div class="font-bold mt-1">{{stock.c_5050}}</div>
+                    </div>
+                    <div class="text-center">
+                        <div><i class="fas fa-forward-step"></i></div>
+                        <div class="font-bold mt-1">{{stock.c_skip}}</div>
+                    </div>
+                    <div class="text-center">
+                        <div><i class="fas fa-snowflake"></i></div>
+                        <div class="font-bold mt-1">{{stock.c_freeze}}</div>
+                    </div>
                 </a>
             </div>
             {{/tieneStock}}
