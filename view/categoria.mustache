@@ -84,9 +84,30 @@
                 </form>
 
                 <div class="mt-6 text-center">
-                    <a href="/" class="text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors">Cancelar</a>
+                    <button id="btn-cancelar" type="button"
+                            class="text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors cursor-pointer">
+                        Cancelar
+                    </button>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<div id="cancel-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40">
+    <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm mx-4 text-center">
+        <div class="text-4xl mb-3">⚠️</div>
+        <h3 class="text-lg font-bold text-gray-800 mb-2">¿Cancelar partida?</h3>
+        <p class="text-sm text-gray-500 mb-6">Si cancelás, la partida se dará por terminada y se guardará con el puntaje actual.</p>
+        <div class="flex gap-3">
+            <button id="btn-cancel-no" type="button"
+                    class="flex-1 bg-gray-100 font-medium px-5 py-3 rounded-full text-gray-700 transition-colors cursor-pointer hover:bg-gray-200">
+                Seguir jugando
+            </button>
+            <a id="btn-cancel-yes" href="/juego/cancelar?id={{partida.id}}"
+               class="flex-1 bg-red-500 font-medium px-5 py-3 rounded-full text-white transition-colors cursor-pointer hover:bg-red-600 text-center no-underline inline-block">
+                Sí, terminar
+            </a>
         </div>
     </div>
 </div>
@@ -258,6 +279,24 @@
         sessionStorage.removeItem('ruleta_spin');
         form.submit();
     });
+
+    var btnCancelar = document.getElementById('btn-cancelar');
+    var cancelModal = document.getElementById('cancel-modal');
+    var btnCancelNo = document.getElementById('btn-cancel-no');
+
+    if (btnCancelar && cancelModal) {
+        btnCancelar.addEventListener('click', function() {
+            cancelModal.classList.remove('hidden');
+        });
+        btnCancelNo.addEventListener('click', function() {
+            cancelModal.classList.add('hidden');
+        });
+        cancelModal.addEventListener('click', function(e) {
+            if (e.target === cancelModal) {
+                cancelModal.classList.add('hidden');
+            }
+        });
+    }
 
     drawWheel(0);
 })();

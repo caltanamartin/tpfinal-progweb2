@@ -330,6 +330,31 @@ class JuegoController
         Redirect::to('/juego/resultado?id=' . $partidaId);
     }
 
+    public function cancelar()
+    {
+        $usuario = $_SESSION['usuario'] ?? null;
+        if (!$usuario) {
+            Redirect::to('/login');
+        }
+
+        $partidaId = $this->request->get('id');
+        if (!Validator::positiveInt($partidaId)) {
+            Redirect::to('/');
+        }
+
+        $partida = $this->partidaModel->obtener($partidaId);
+        if (!$partida || $partida['usuario_id'] != $usuario['id']) {
+            Redirect::to('/');
+        }
+
+        if ($partida['estado'] === 'jugando') {
+            $this->partidaModel->terminar($partidaId);
+        }
+
+        unset($_SESSION['partida_actual']);
+        Redirect::to('/');
+    }
+
     public function reportar()
     {
         $usuario = $_SESSION['usuario'] ?? null;
