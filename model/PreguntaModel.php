@@ -25,32 +25,79 @@ class PreguntaModel
         }
 
         $idsEnPartida = $this->obtenerIdsVistosEnPartida($partidaId);
-        $filtroExcluir = !empty($idsEnPartida) ? "p.id NOT IN (" . implode(',', $idsEnPartida) . ")" : "1=1";
-        $filtroCategoria = $categoriaId ? "AND p.categoria_id = $categoriaId" : "";
 
-        $pregunta = $this->buscarPorDificultad($dificultadElegida, $filtroExcluir, $filtroCategoria);
+        $pregunta = $this->buscarPorDificultad($dificultadElegida, $idsEnPartida, $categoriaId);
         if ($pregunta) return $pregunta;
 
-        $pregunta = $this->buscarPorDificultad('neutra', $filtroExcluir, $filtroCategoria);
+        $pregunta = $this->buscarPorDificultad('neutra', $idsEnPartida, $categoriaId);
         if ($pregunta) return $pregunta;
 
-        return $this->buscarTodas($filtroExcluir, $filtroCategoria);
+        return $this->buscarTodas($idsEnPartida, $categoriaId);
     }
 
-    private function buscarPorDificultad($dificultad, $filtroExclusion, $filtroCategoria = '')
+    private function buscarPorDificultad($dificultad, $idsEnPartida, $categoriaId = null)
     {
+        $params = [];
+
+        if ($dificultad === 'facil') {
+            $having = "total_respuestas_global >= ? AND (total_correctas_global / total_respuestas_global) > 0.7";
+            $params[] = $this->minRespuestasGlobales;
+        } elseif ($dificultad === 'dificil') {
+            $having = "total_respuestas_global >= ? AND (total_correctas_global / total_respuestas_global) < 0.3";
+            $params[] = $this->minRespuestasGlobales;
+        } elseif ($dificultad === 'media') {
+            $having = "total_respuestas_global >= ? AND (total_correctas_global / total_respuestas_global) BETWEEN 0.3 AND 0.7";
+            $params[] = $this->minRespuestasGlobales;
+        } else {
+            $having = "? IS NULL OR total_respuestas_global < ?";
+            $params[] = null;
+            $params[] = $this->minRespuestasGlobales;
+        }
+
+        $where = "p.activa = 1";
+        if (!empty($idsEnPartida)) {
+            $placeholders = implode(',', array_fill(0, count($idsEnPartida), '?'));
+            $where .= " AND p.id NOT IN ($placeholders)";
+            $params = array_merge($params, $idsEnPartida);
+        }
+        if ($categoriaId) {
+            $where .= " AND p.categoria_id = ?";
+            $params[] = $categoriaId;
+        }
+
         $order = ($dificultad === 'neutra')
             ? "total_respuestas_global DESC, RAND()"
             : "RAND()";
 
-        if ($dificultad === 'facil') {
-            $having = "total_respuestas_global >= $this->minRespuestasGlobales AND (total_correctas_global / total_respuestas_global) > 0.7";
-        } elseif ($dificultad === 'dificil') {
-            $having = "total_respuestas_global >= $this->minRespuestasGlobales AND (total_correctas_global / total_respuestas_global) < 0.3";
-        } elseif ($dificultad === 'media') {
-            $having = "total_respuestas_global >= $this->minRespuestasGlobales AND (total_correctas_global / total_respuestas_global) BETWEEN 0.3 AND 0.7";
-        } else {
-            $having = "(total_respuestas_global < $this->minRespuestasGlobales OR total_respuestas_global IS NULL)";
+        $sql = "SELECT p.*, c.nombre AS categoria_nombre, c.color AS categoria_color,
+                       COUNT(pp.id) AS total_respuestas_global,
+                       IFNULL(SUM(pp.es_correcta), 0) AS total_correctas_global
+                FROM preguntas p
+                JOIN categorias c ON c.id = p.categoria_id
+                LEFT JOIN partidas_preguntas pp ON pp.pregunta_id = p.id
+                WHERE $where
+                GROUP BY p.id
+                HAVING $having
+                ORDER BY $order
+                LIMIT 1";
+
+        $result = $this->database->queryPrepared($sql, $params);
+        return !empty($result) ? $result[0] : null;
+    }
+
+    private function buscarTodas($idsEnPartida, $categoriaId = null)
+    {
+        $params = [];
+
+        $where = "p.activa = 1";
+        if (!empty($idsEnPartida)) {
+            $placeholders = implode(',', array_fill(0, count($idsEnPartida), '?'));
+            $where .= " AND p.id NOT IN ($placeholders)";
+            $params = $idsEnPartida;
+        }
+        if ($categoriaId) {
+            $where .= " AND p.categoria_id = ?";
+            $params[] = $categoriaId;
         }
 
         $sql = "SELECT p.*, c.nombre AS categoria_nombre, c.color AS categoria_color,
@@ -59,29 +106,11 @@ class PreguntaModel
                 FROM preguntas p
                 JOIN categorias c ON c.id = p.categoria_id
                 LEFT JOIN partidas_preguntas pp ON pp.pregunta_id = p.id
-                WHERE p.activa = 1 AND $filtroExclusion $filtroCategoria
-                GROUP BY p.id
-                HAVING $having
-                ORDER BY $order
-                LIMIT 1";
-
-        $result = $this->database->query($sql);
-        return !empty($result) ? $result[0] : null;
-    }
-
-    private function buscarTodas($filtroExclusion, $filtroCategoria = '')
-    {
-        $sql = "SELECT p.*, c.nombre AS categoria_nombre, c.color AS categoria_color,
-                       COUNT(pp.id) AS total_respuestas_global,
-                       IFNULL(SUM(pp.es_correcta), 0) AS total_correctas_global
-                FROM preguntas p
-                JOIN categorias c ON c.id = p.categoria_id
-                LEFT JOIN partidas_preguntas pp ON pp.pregunta_id = p.id
-                WHERE p.activa = 1 AND $filtroExclusion $filtroCategoria
+                WHERE $where
                 GROUP BY p.id
                 ORDER BY RAND() LIMIT 1";
 
-        $result = $this->database->query($sql);
+        $result = $this->database->queryPrepared($sql, $params);
         return !empty($result) ? $result[0] : null;
     }
 
@@ -102,8 +131,8 @@ class PreguntaModel
                        IFNULL(SUM(es_correcta), 0) AS correctas
                 FROM partidas_preguntas pp
                 JOIN partidas p ON p.id = pp.partida_id
-                WHERE p.usuario_id = $usuarioId AND pp.respuesta IS NOT NULL";
-        $result = $this->database->query($sql);
+                WHERE p.usuario_id = ? AND pp.respuesta IS NOT NULL";
+        $result = $this->database->queryPrepared($sql, [$usuarioId]);
         $total = (int)$result[0]['total'];
 
         if ($total < 5) {
@@ -115,8 +144,9 @@ class PreguntaModel
 
     private function obtenerIdsVistosEnPartida($partidaId)
     {
-        $result = $this->database->query(
-            "SELECT pregunta_id FROM partidas_preguntas WHERE partida_id = $partidaId"
+        $result = $this->database->queryPrepared(
+            "SELECT pregunta_id FROM partidas_preguntas WHERE partida_id = ?",
+            [$partidaId]
         );
         return array_column($result, 'pregunta_id');
     }
@@ -126,15 +156,14 @@ class PreguntaModel
         $sql = "SELECT p.*, c.nombre AS categoria_nombre, c.color AS categoria_color
                 FROM preguntas p
                 JOIN categorias c ON c.id = p.categoria_id
-                WHERE p.id = $preguntaId";
-        $result = $this->database->query($sql);
+                WHERE p.id = ?";
+        $result = $this->database->queryPrepared($sql, [$preguntaId]);
         return !empty($result) ? $result[0] : null;
     }
 
     public function getPreguntasActivas()
     {
-        $sql = "SELECT COUNT(*) AS total FROM preguntas WHERE activa = 1";
-        $result = $this->database->query($sql);
+        $result = $this->database->queryPrepared("SELECT COUNT(*) AS total FROM preguntas WHERE activa = 1");
         return $result[0]['total'];
     }
 
@@ -142,7 +171,7 @@ class PreguntaModel
     {
         $intervalo = $this->intervaloSql($filtro);
         $sql = "SELECT COUNT(*) AS total FROM preguntas WHERE creado_en >= DATE_SUB(NOW(), INTERVAL $intervalo)";
-        $result = $this->database->query($sql);
+        $result = $this->database->queryPrepared($sql);
         return $result[0]['total'];
     }
 
@@ -158,41 +187,44 @@ class PreguntaModel
 
     public function getCategorias()
     {
-        return $this->database->query("SELECT * FROM categorias");
+        return $this->database->queryPrepared("SELECT * FROM categorias");
     }
 
     public function reportar($preguntaId, $usuarioId, $motivo)
     {
-        $motivo = $this->database->escape($motivo ?: '');
         $sql = "INSERT INTO reportes_preguntas (pregunta_id, usuario_id, motivo)
-                VALUES ($preguntaId, $usuarioId, '$motivo')";
-        return $this->database->execute($sql);
+                VALUES (?, ?, ?)";
+        return $this->database->executePrepared($sql, [$preguntaId, $usuarioId, $motivo ?: '']);
     }
 
     public function crear($categoriaId, $pregunta, $opcionA, $opcionB, $opcionC, $opcionD, $respuestaCorrecta, $creadorId = null, $rol = 'usuario')
     {
         $activa = ($rol === 'editor' || $rol === 'admin') ? 1 : 0;
-        $creador = $creadorId ?: 'NULL';
         $sql = "INSERT INTO preguntas (categoria_id, pregunta, opcion_a, opcion_b, opcion_c, opcion_d, respuesta_correcta, activa, creador_id)
-                VALUES ($categoriaId, '$pregunta', '$opcionA', '$opcionB', '$opcionC', '$opcionD', '$respuestaCorrecta', $activa, $creador)";
-        return $this->database->execute($sql);
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        return $this->database->executePrepared($sql, [$categoriaId, $pregunta, $opcionA, $opcionB, $opcionC, $opcionD, $respuestaCorrecta, $activa, $creadorId]);
     }
 
     public function listarTodas($pagina = null, $porPagina = null)
     {
+        if ($pagina && $porPagina) {
+            $offset = ($pagina - 1) * $porPagina;
+            $sql = "SELECT p.*, c.nombre AS categoria_nombre, c.color AS categoria_color,
+                           u.username AS creador_username
+                    FROM preguntas p
+                    JOIN categorias c ON c.id = p.categoria_id
+                    LEFT JOIN usuarios u ON u.id = p.creador_id
+                    ORDER BY p.id DESC LIMIT ? OFFSET ?";
+            $total = $this->database->queryPrepared("SELECT COUNT(*) AS total FROM preguntas")[0]['total'];
+            return ['filas' => $this->database->queryPrepared($sql, [$porPagina, $offset]), 'total' => $total, 'paginas' => (int)ceil($total / $porPagina)];
+        }
         $sql = "SELECT p.*, c.nombre AS categoria_nombre, c.color AS categoria_color,
                        u.username AS creador_username
                 FROM preguntas p
                 JOIN categorias c ON c.id = p.categoria_id
                 LEFT JOIN usuarios u ON u.id = p.creador_id
                 ORDER BY p.id DESC";
-        if ($pagina && $porPagina) {
-            $offset = ($pagina - 1) * $porPagina;
-            $total = $this->database->query("SELECT COUNT(*) AS total FROM preguntas")[0]['total'];
-            $sql .= " LIMIT $porPagina OFFSET $offset";
-            return ['filas' => $this->database->query($sql), 'total' => $total, 'paginas' => (int)ceil($total / $porPagina)];
-        }
-        return $this->database->query($sql);
+        return $this->database->queryPrepared($sql);
     }
 
     public function obtener($id)
@@ -200,76 +232,89 @@ class PreguntaModel
         $sql = "SELECT p.*, c.nombre AS categoria_nombre
                 FROM preguntas p
                 JOIN categorias c ON c.id = p.categoria_id
-                WHERE p.id = $id";
-        $result = $this->database->query($sql);
+                WHERE p.id = ?";
+        $result = $this->database->queryPrepared($sql, [$id]);
         return !empty($result) ? $result[0] : null;
     }
 
     public function actualizar($id, $data)
     {
-        $sets = [];
+        $parts = [];
+        $params = [];
         foreach ($data as $campo => $valor) {
-            $sets[] = "$campo = '$valor'";
+            $parts[] = "$campo = ?";
+            $params[] = $valor;
         }
-        $sql = "UPDATE preguntas SET " . implode(', ', $sets) . " WHERE id = $id";
-        return $this->database->execute($sql);
+        $sql = "UPDATE preguntas SET " . implode(', ', $parts) . " WHERE id = ?";
+        $params[] = $id;
+        return $this->database->executePrepared($sql, $params);
     }
 
     public function desactivar($id, $editorId)
     {
-        $sql = "UPDATE preguntas SET activa = 0, revisada_por = $editorId, revisada_en = NOW() WHERE id = $id";
-        return $this->database->execute($sql);
+        $sql = "UPDATE preguntas SET activa = 0, revisada_por = ?, revisada_en = NOW() WHERE id = ?";
+        return $this->database->executePrepared($sql, [$editorId, $id]);
     }
 
     public function listarReportes($pagina = null, $porPagina = null)
     {
+        if ($pagina && $porPagina) {
+            $offset = ($pagina - 1) * $porPagina;
+            $sql = "SELECT rp.*, p.pregunta AS pregunta_texto, u.username AS reportado_por
+                    FROM reportes_preguntas rp
+                    JOIN preguntas p ON p.id = rp.pregunta_id
+                    JOIN usuarios u ON u.id = rp.usuario_id
+                    WHERE rp.accion IS NULL
+                    ORDER BY rp.creado_en DESC LIMIT ? OFFSET ?";
+            $total = $this->database->queryPrepared("SELECT COUNT(*) AS total FROM reportes_preguntas WHERE accion IS NULL")[0]['total'];
+            return ['filas' => $this->database->queryPrepared($sql, [$porPagina, $offset]), 'total' => $total, 'paginas' => (int)ceil($total / $porPagina)];
+        }
         $sql = "SELECT rp.*, p.pregunta AS pregunta_texto, u.username AS reportado_por
                 FROM reportes_preguntas rp
                 JOIN preguntas p ON p.id = rp.pregunta_id
                 JOIN usuarios u ON u.id = rp.usuario_id
                 WHERE rp.accion IS NULL
                 ORDER BY rp.creado_en DESC";
-        if ($pagina && $porPagina) {
-            $offset = ($pagina - 1) * $porPagina;
-            $total = $this->database->query("SELECT COUNT(*) AS total FROM reportes_preguntas WHERE accion IS NULL")[0]['total'];
-            $sql .= " LIMIT $porPagina OFFSET $offset";
-            return ['filas' => $this->database->query($sql), 'total' => $total, 'paginas' => (int)ceil($total / $porPagina)];
-        }
-        return $this->database->query($sql);
+        return $this->database->queryPrepared($sql);
     }
 
     public function resolverReporte($reporteId, $editorId, $accion)
     {
-        $sql = "UPDATE reportes_preguntas SET resuelto_por = $editorId, resuelto_en = NOW(), accion = '$accion' WHERE id = $reporteId";
-        return $this->database->execute($sql);
+        $sql = "UPDATE reportes_preguntas SET resuelto_por = ?, resuelto_en = NOW(), accion = ? WHERE id = ?";
+        return $this->database->executePrepared($sql, [$editorId, $accion, $reporteId]);
     }
 
     public function listarPendientes($pagina = null, $porPagina = null)
     {
+        if ($pagina && $porPagina) {
+            $offset = ($pagina - 1) * $porPagina;
+            $sql = "SELECT p.*, c.nombre AS categoria_nombre, c.color AS categoria_color, u.username AS creador_username
+                    FROM preguntas p
+                    JOIN categorias c ON c.id = p.categoria_id
+                    LEFT JOIN usuarios u ON u.id = p.creador_id
+                    WHERE p.activa = 0 AND p.revisada_por IS NULL
+                    ORDER BY p.creado_en DESC LIMIT ? OFFSET ?";
+            $total = $this->database->queryPrepared("SELECT COUNT(*) AS total FROM preguntas WHERE activa = 0 AND revisada_por IS NULL")[0]['total'];
+            return ['filas' => $this->database->queryPrepared($sql, [$porPagina, $offset]), 'total' => $total, 'paginas' => (int)ceil($total / $porPagina)];
+        }
         $sql = "SELECT p.*, c.nombre AS categoria_nombre, c.color AS categoria_color, u.username AS creador_username
                 FROM preguntas p
                 JOIN categorias c ON c.id = p.categoria_id
                 LEFT JOIN usuarios u ON u.id = p.creador_id
                 WHERE p.activa = 0 AND p.revisada_por IS NULL
                 ORDER BY p.creado_en DESC";
-        if ($pagina && $porPagina) {
-            $offset = ($pagina - 1) * $porPagina;
-            $total = $this->database->query("SELECT COUNT(*) AS total FROM preguntas WHERE activa = 0 AND revisada_por IS NULL")[0]['total'];
-            $sql .= " LIMIT $porPagina OFFSET $offset";
-            return ['filas' => $this->database->query($sql), 'total' => $total, 'paginas' => (int)ceil($total / $porPagina)];
-        }
-        return $this->database->query($sql);
+        return $this->database->queryPrepared($sql);
     }
 
     public function aprobar($id, $editorId)
     {
-        $sql = "UPDATE preguntas SET activa = 1, revisada_por = $editorId, revisada_en = NOW() WHERE id = $id";
-        return $this->database->execute($sql);
+        $sql = "UPDATE preguntas SET activa = 1, revisada_por = ?, revisada_en = NOW() WHERE id = ?";
+        return $this->database->executePrepared($sql, [$editorId, $id]);
     }
 
     public function eliminar($id)
     {
-        $sql = "DELETE FROM preguntas WHERE id = $id";
-        return $this->database->execute($sql);
+        $sql = "DELETE FROM preguntas WHERE id = ?";
+        return $this->database->executePrepared($sql, [$id]);
     }
 }

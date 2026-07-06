@@ -11,8 +11,8 @@ class UsuarioModel
 
     public function getByUsername($username)
     {
-        $sql = "SELECT * FROM usuarios WHERE username = '$username'";
-        $result = $this->database->query($sql);
+        $sql = "SELECT * FROM usuarios WHERE username = ?";
+        $result = $this->database->queryPrepared($sql, [$username]);
         return !empty($result) ? $result[0] : null;
     }
 
@@ -23,43 +23,44 @@ class UsuarioModel
                    COUNT(p.id) AS cantidad_partidas
             FROM usuarios u
             LEFT JOIN partidas p ON p.usuario_id = u.id AND p.estado = 'terminada'
-            WHERE u.id = $id
+            WHERE u.id = ?
             GROUP BY u.id";
-        $result = $this->database->query($sql);
+        $result = $this->database->queryPrepared($sql, [$id]);
         return $result[0] ?? null;
     }
 
     public function getByEmail($email)
     {
-        $sql = "SELECT * FROM usuarios WHERE email = '$email'";
-        $result = $this->database->query($sql);
+        $sql = "SELECT * FROM usuarios WHERE email = ?";
+        $result = $this->database->queryPrepared($sql, [$email]);
         return !empty($result) ? $result[0] : null;
     }
 
     public function crear($email, $nombre, $username, $password, $anioNacimiento, $sexo, $pais, $ciudad, $fotoPerfil)
     {
+        $hash = password_hash($password, PASSWORD_DEFAULT);
         $sql = "INSERT INTO usuarios (email, nombre, username, password, anio_nacimiento, sexo, pais, ciudad, foto_perfil)
-                VALUES ('$email', '$nombre', '$username', '$password', '$anioNacimiento', '$sexo', '$pais', '$ciudad', '$fotoPerfil')";
-        return $this->database->execute($sql);
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        return $this->database->executePrepared($sql, [$email, $nombre, $username, $hash, $anioNacimiento, $sexo, $pais, $ciudad, $fotoPerfil]);
     }
 
     public function saveToken($id, $token)
     {
-        $sql = "UPDATE usuarios SET token_verificacion = '$token' WHERE id = $id";
-        return $this->database->execute($sql);
+        $sql = "UPDATE usuarios SET token_verificacion = ? WHERE id = ?";
+        return $this->database->executePrepared($sql, [$token, $id]);
     }
 
     public function findByToken($token)
     {
-        $sql = "SELECT * FROM usuarios WHERE token_verificacion = '$token'";
-        $result = $this->database->query($sql);
+        $sql = "SELECT * FROM usuarios WHERE token_verificacion = ?";
+        $result = $this->database->queryPrepared($sql, [$token]);
         return $result[0] ?? null;
     }
 
     public function setVerificado($id)
     {
-        $sql = "UPDATE usuarios SET verificado = 1, token_verificacion = NULL WHERE id = $id";
-        return $this->database->execute($sql);
+        $sql = "UPDATE usuarios SET verificado = 1, token_verificacion = NULL WHERE id = ?";
+        return $this->database->executePrepared($sql, [$id]);
     }
 
     public function getRanking($limite = 50, $rolFiltro = null)
@@ -70,20 +71,23 @@ class UsuarioModel
                 FROM usuarios u
                 LEFT JOIN partidas p ON p.usuario_id = u.id AND p.estado = 'terminada'
                 WHERE u.verificado = 1";
+        $params = [];
         if ($rolFiltro === 'usuario') {
-            $sql .= " AND u.rol = 'usuario'";
+            $sql .= " AND u.rol = ?";
+            $params[] = 'usuario';
         }
         $sql .= " GROUP BY u.id
                   ORDER BY puntaje_total DESC
-                  LIMIT $limite";
-        return $this->database->query($sql);
+                  LIMIT ?";
+        $params[] = $limite;
+        return $this->database->queryPrepared($sql, $params);
     }
 
     public function getTotalJugadores($filtro = 'mes')
     {
         $intervalo = $this->intervaloSql($filtro);
         $sql = "SELECT COUNT(*) AS total FROM usuarios WHERE verificado = 1 AND creado_en >= DATE_SUB(NOW(), INTERVAL $intervalo)";
-        $result = $this->database->query($sql);
+        $result = $this->database->queryPrepared($sql);
         return $result[0]['total'];
     }
 
@@ -95,7 +99,7 @@ class UsuarioModel
                 FROM usuarios
                 WHERE creado_en >= DATE_SUB(NOW(), INTERVAL $intervalo)
                 GROUP BY periodo ORDER BY periodo";
-        return $this->database->query($sql);
+        return $this->database->queryPrepared($sql);
     }
 
     public function getUsuariosPorPais($filtro = 'mes')
@@ -105,7 +109,7 @@ class UsuarioModel
                 FROM usuarios
                 WHERE pais != '' AND creado_en >= DATE_SUB(NOW(), INTERVAL $intervalo)
                 GROUP BY pais ORDER BY total DESC";
-        return $this->database->query($sql);
+        return $this->database->queryPrepared($sql);
     }
 
     public function getUsuariosPorRol()
@@ -113,7 +117,7 @@ class UsuarioModel
         $sql = "SELECT rol, COUNT(*) AS total
                 FROM usuarios
                 GROUP BY rol";
-        return $this->database->query($sql);
+        return $this->database->queryPrepared($sql);
     }
 
     public function getUsuariosPorSexo($filtro = 'mes')
@@ -123,7 +127,7 @@ class UsuarioModel
                 FROM usuarios
                 WHERE creado_en >= DATE_SUB(NOW(), INTERVAL $intervalo)
                 GROUP BY sexo";
-        return $this->database->query($sql);
+        return $this->database->queryPrepared($sql);
     }
 
     public function getUsuariosPorEdad($filtro = 'mes')
@@ -141,7 +145,7 @@ class UsuarioModel
                 WHERE creado_en >= DATE_SUB(NOW(), INTERVAL $intervalo)
                 GROUP BY grupo_etario
                 ORDER BY FIELD(grupo_etario, 'Menores', 'Medio', 'Jubilados', 'Sin especificar')";
-        return $this->database->query($sql);
+        return $this->database->queryPrepared($sql);
     }
 
     public function getPorcentajeCorrectasPorUsuario($filtro = 'mes')
@@ -157,7 +161,7 @@ class UsuarioModel
                 WHERE u.verificado = 1 AND pp.respondida_en >= DATE_SUB(NOW(), INTERVAL $intervalo)
                 GROUP BY u.id
                 ORDER BY porcentaje DESC";
-        return $this->database->query($sql);
+        return $this->database->queryPrepared($sql);
     }
 
     private function intervaloSql($filtro)
@@ -181,14 +185,14 @@ class UsuarioModel
 
     public function getAll($pagina = null, $porPagina = null)
     {
-        $sql = "SELECT id, email, nombre, username, anio_nacimiento, sexo, pais, ciudad, foto_perfil, verificado, rol, creado_en FROM usuarios ORDER BY id";
         if ($pagina && $porPagina) {
             $offset = ($pagina - 1) * $porPagina;
-            $sql .= " LIMIT $porPagina OFFSET $offset";
-            $total = $this->database->query("SELECT COUNT(*) AS total FROM usuarios")[0]['total'];
-            return ['filas' => $this->database->query($sql), 'total' => $total, 'paginas' => (int)ceil($total / $porPagina)];
+            $sql = "SELECT id, email, nombre, username, anio_nacimiento, sexo, pais, ciudad, foto_perfil, verificado, rol, creado_en FROM usuarios ORDER BY id LIMIT ? OFFSET ?";
+            $total = $this->database->queryPrepared("SELECT COUNT(*) AS total FROM usuarios")[0]['total'];
+            return ['filas' => $this->database->queryPrepared($sql, [$porPagina, $offset]), 'total' => $total, 'paginas' => (int)ceil($total / $porPagina)];
         }
-        return $this->database->query($sql);
+        $sql = "SELECT id, email, nombre, username, anio_nacimiento, sexo, pais, ciudad, foto_perfil, verificado, rol, creado_en FROM usuarios ORDER BY id";
+        return $this->database->queryPrepared($sql);
     }
 
     public function actualizar($username, $cambios)
@@ -197,12 +201,15 @@ class UsuarioModel
             return 0;
         }
 
-        $sets = [];
+        $parts = [];
+        $params = [];
         foreach ($cambios as $campo => $valor) {
-            $sets[] = "$campo = '$valor'";
+            $parts[] = "$campo = ?";
+            $params[] = $valor;
         }
 
-        $sql = "UPDATE usuarios SET " . implode(', ', $sets) . " WHERE username = '$username'";
-        return $this->database->execute($sql);
+        $sql = "UPDATE usuarios SET " . implode(', ', $parts) . " WHERE username = ?";
+        $params[] = $username;
+        return $this->database->executePrepared($sql, $params);
     }
 }

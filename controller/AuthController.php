@@ -33,7 +33,7 @@ class AuthController
 
             $usuario = $this->model->getByUsername($username);
 
-            if ($usuario && $password === $usuario['password']) {
+            if ($usuario && password_verify($password, $usuario['password'])) {
                 if (!$usuario['verificado']) {
                     $data['error'] = "Tenés que verificar tu cuenta por email antes de iniciar sesión.";
                 } else {

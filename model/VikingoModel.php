@@ -13,35 +13,35 @@ class VikingoModel
     {
         $sql = "SELECT * FROM guerreros";
         Log::info("SQL: $sql");
-        return $this->database->query($sql);
+        return $this->database->queryPrepared($sql);
     }
 
     public function getVikingo($id)
     {
-        $sql = "SELECT * FROM guerreros WHERE id = $id";
+        $sql = "SELECT * FROM guerreros WHERE id = ?";
         Log::info("SQL: $sql");
-        $filas = $this->database->query($sql);
+        $filas = $this->database->queryPrepared($sql, [$id]);
         return !empty($filas) ? $filas[0] : null;
     }
 
     public function alta($nombre, $apodo, $clan, $fuerza)
     {
-        $sql = "INSERT INTO guerreros (nombre, apodo, clan, fuerza) VALUES ('$nombre', '$apodo', '$clan', $fuerza)";
+        $sql = "INSERT INTO guerreros (nombre, apodo, clan, fuerza) VALUES (?, ?, ?, ?)";
         Log::info("SQL: $sql");
-        return $this->database->execute($sql);
+        return $this->database->executePrepared($sql, [$nombre, $apodo, $clan, $fuerza]);
     }
 
     public function editar($id, $nombre, $apodo, $clan, $fuerza)
     {
-        $sql = "UPDATE guerreros SET nombre = '$nombre', apodo = '$apodo', clan = '$clan', fuerza = $fuerza WHERE id = $id";
+        $sql = "UPDATE guerreros SET nombre = ?, apodo = ?, clan = ?, fuerza = ? WHERE id = ?";
         Log::info("SQL: $sql");
-        $this->database->execute($sql);
+        $this->database->executePrepared($sql, [$nombre, $apodo, $clan, $fuerza, $id]);
     }
 
     public function eliminar($id)
     {
-        $sql = "DELETE FROM guerreros WHERE id = $id";
+        $sql = "DELETE FROM guerreros WHERE id = ?";
         Log::info("SQL: $sql");
-        $this->database->execute($sql);
+        $this->database->executePrepared($sql, [$id]);
     }
 }

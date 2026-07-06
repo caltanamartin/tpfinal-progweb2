@@ -11,11 +11,9 @@ class PartidaPreguntaModel
 
     public function registrar($partidaId, $preguntaId, $respuesta, $esCorrecta, $orden)
     {
-        $respuesta = $respuesta ? "'$respuesta'" : "NULL";
-        $esCorrecta = $esCorrecta !== null ? $esCorrecta : "NULL";
         $sql = "INSERT INTO partidas_preguntas (partida_id, pregunta_id, respuesta, es_correcta, orden, respondida_en)
-                VALUES ($partidaId, $preguntaId, $respuesta, $esCorrecta, $orden, NOW())";
-        $this->database->execute($sql);
+                VALUES (?, ?, ?, ?, ?, NOW())";
+        $this->database->executePrepared($sql, [$partidaId, $preguntaId, $respuesta, $esCorrecta, $orden]);
     }
 
     public function obtenerUltimaRespuesta($partidaId)
@@ -26,16 +24,16 @@ class PartidaPreguntaModel
                 FROM partidas_preguntas pp
                 JOIN preguntas p ON p.id = pp.pregunta_id
                 JOIN categorias c ON c.id = p.categoria_id
-                WHERE pp.partida_id = $partidaId AND pp.respuesta IS NOT NULL
+                WHERE pp.partida_id = ? AND pp.respuesta IS NOT NULL
                 ORDER BY pp.orden DESC LIMIT 1";
-        $result = $this->database->query($sql);
-        return $result[0];
+        $result = $this->database->queryPrepared($sql, [$partidaId]);
+        return !empty($result) ? $result[0] : null;
     }
 
     public function siguienteOrden($partidaId)
     {
-        $sql = "SELECT IFNULL(MAX(orden), 0) + 1 AS sig FROM partidas_preguntas WHERE partida_id = $partidaId";
-        $result = $this->database->query($sql);
+        $sql = "SELECT IFNULL(MAX(orden), 0) + 1 AS sig FROM partidas_preguntas WHERE partida_id = ?";
+        $result = $this->database->queryPrepared($sql, [$partidaId]);
         return $result[0]['sig'];
     }
 
