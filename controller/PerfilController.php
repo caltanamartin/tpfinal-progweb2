@@ -109,8 +109,9 @@ class PerfilController
             Redirect::to('/perfil');
         }
 
-        $usuario['esEditor'] = ($_SESSION['usuario']['rol'] ?? 'usuario') === 'editor';
-        $usuario['esAdmin'] = ($_SESSION['usuario']['rol'] ?? 'usuario') === 'admin';
+        $logueado = $_SESSION['usuario'] ?? null;
+        $usuario['esEditor'] = $logueado && $logueado['rol'] === 'editor';
+        $usuario['esAdmin'] = $logueado && $logueado['rol'] === 'admin';
         $qrUrl = $this->buildQrUrl($usuario['id']);
 
         $this->renderer->render("perfil", [

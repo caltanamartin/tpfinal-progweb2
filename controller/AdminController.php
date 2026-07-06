@@ -112,7 +112,6 @@ class AdminController
             'usuariosPorEdadJson' => json_encode($usuariosPorEdad),
             'porcentajeCorrectas' => $porcentajeCorrectas,
             'porcentajeCorrectasJson' => json_encode($porcentajeCorrectas),
-            'exito' => $exito,
             'todosUsuarios' => $todosUsuarios,
             'todasPartidas' => $todasPartidas,
             'todasPreguntas' => $todasPreguntas,
