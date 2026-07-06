@@ -32,7 +32,10 @@ class PreguntaModel
         $pregunta = $this->buscarPorDificultad('neutra', $idsEnPartida, $categoriaId);
         if ($pregunta) return $pregunta;
 
-        return $this->buscarTodas($idsEnPartida, $categoriaId);
+        $pregunta = $this->buscarTodas($idsEnPartida, $categoriaId);
+        if ($pregunta) return $pregunta;
+
+        return $this->buscarTodas([], $categoriaId);
     }
 
     private function buscarPorDificultad($dificultad, $idsEnPartida, $categoriaId = null)
