@@ -216,10 +216,7 @@ class TrampitaController
             }
             Redirect::to('/juego?id=' . $partidaId);
         } elseif ($tipo === 'congelar_tiempo') {
-            $_SESSION['partida_actual']['mostrada_en'] = min(
-                $_SESSION['partida_actual']['mostrada_en'] + 15,
-                time()
-            );
+            $_SESSION['partida_actual']['mostrada_en'] += 15;
             Redirect::to('/juego?id=' . $partidaId);
         }
     }
