@@ -72,6 +72,7 @@ class AdminController
             $u['rol_admin'] = ($u['rol'] === 'admin');
             $u['rol_editor'] = ($u['rol'] === 'editor');
             $u['rol_usuario'] = ($u['rol'] === 'usuario');
+            $u['trampitas_compradas'] = $this->usuarioModel->contarTrampitas($u['id']);
         }
         unset($u);
 

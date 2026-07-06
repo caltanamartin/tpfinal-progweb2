@@ -185,6 +185,13 @@ class UsuarioModel
         }
     }
 
+    public function contarTrampitas($usuarioId)
+    {
+        $sql = "SELECT COUNT(*) AS total FROM trampitas_compradas WHERE usuario_id = ?";
+        $result = $this->database->queryPrepared($sql, [$usuarioId]);
+        return !empty($result) ? (int)$result[0]['total'] : 0;
+    }
+
     public function getAll($pagina = null, $porPagina = null)
     {
         if ($pagina && $porPagina) {
