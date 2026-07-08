@@ -13,12 +13,42 @@ class PerfilController
         $this->request = $request;
     }
 
-    public function ver()
+    public function ver($id = null)
     {
+        if ($id) {
+            if (!Validator::positiveInt($id)) {
+                Redirect::to('/ranking');
+            }
+            $usuario = $this->model->getUsuarioConEstadisticas($id);
+
+            if (!$usuario) {
+                Redirect::to('/ranking');
+            }
+
+            $esPropio = isset($_SESSION['usuario']) && $_SESSION['usuario']['id'] == $id;
+
+            if ($esPropio) {
+                Redirect::to('/perfil');
+            }
+
+            $logueado = $_SESSION['usuario'] ?? null;
+            $usuario['esEditor'] = $logueado && $logueado['rol'] === 'editor';
+            $usuario['esAdmin'] = $logueado && $logueado['rol'] === 'admin';
+            $qrUrl = $this->buildQrUrl($usuario['id']);
+
+            $this->renderer->render("perfil", [
+                "usuario" => $usuario,
+                "esPerfil" => true,
+                "esPropio" => false,
+                "qrUrl" => $qrUrl,
+            ]);
+            return;
+        }
+
         $usuario = $_SESSION['usuario'] ?? null;
         
         if (!$usuario) {
-            Redirect::to('/login');
+            Redirect::to('/auth/login');
         }
 
         $usuario = $this->model->getUsuarioConEstadisticas($usuario['id']);
@@ -34,12 +64,12 @@ class PerfilController
         ]);
     }
 
-    public function editarPerfil()
+    public function editar()
     {
         $usuario = $_SESSION['usuario'] ?? null;
 
         if (!$usuario) {
-            Redirect::to('/login');
+            Redirect::to('/auth/login');
         }
 
         $data = [];
@@ -108,34 +138,4 @@ class PerfilController
         return $protocol . $_SERVER['HTTP_HOST'] . '/perfil/' . $userId;
     }
 
-    public function verPublico()
-    {
-        $id = $this->request->get('id');
-        if (!Validator::positiveInt($id)) {
-            Redirect::to('/ranking');
-        }
-        $usuario = $this->model->getUsuarioConEstadisticas($id);
-
-        if (!$usuario) {
-            Redirect::to('/ranking');
-        }
-
-        $esPropio = isset($_SESSION['usuario']) && $_SESSION['usuario']['id'] == $id;
-
-        if ($esPropio) {
-            Redirect::to('/perfil');
-        }
-
-        $logueado = $_SESSION['usuario'] ?? null;
-        $usuario['esEditor'] = $logueado && $logueado['rol'] === 'editor';
-        $usuario['esAdmin'] = $logueado && $logueado['rol'] === 'admin';
-        $qrUrl = $this->buildQrUrl($usuario['id']);
-
-        $this->renderer->render("perfil", [
-            "usuario" => $usuario,
-            "esPerfil" => true,
-            "esPropio" => $esPropio,
-            "qrUrl" => $qrUrl,
-        ]);
-    }
 }

@@ -39,12 +39,17 @@ class Configurator {
             $this->getUsuarioModel(),
             $this->getPartidaModel(),
             $this->getPreguntaModel(),
-            new Request()
+            new Request(),
+            $this->getTrampitasController()
         );
     }
 
-    public function getTrampitaController() {
-        return new TrampitaController(
+    public function getVerificarController() {
+        return new VerificarController($this->getUsuarioModel(), $this->getRenderer());
+    }
+
+    public function getTrampitasController() {
+        return new TrampitasController(
             $this->getRenderer(),
             $this->getTrampitaModel(),
             $this->getPartidaModel(),

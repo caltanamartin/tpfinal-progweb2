@@ -102,12 +102,11 @@ class EditorController
         $this->renderer->render('editor_preguntas', $data);
     }
 
-    public function editar()
+    public function editarPregunta($id = null)
     {
         $usuario = $this->verificarEditorOAdmin();
         if (!$usuario) return;
 
-        $id = $this->request->get('id');
         if (!Validator::positiveInt($id)) {
             Redirect::to($this->backUrl($usuario));
         }
@@ -144,7 +143,7 @@ class EditorController
         $this->renderer->render('editor_editar_pregunta', $data);
     }
 
-    public function guardar()
+    public function guardarPregunta()
     {
         $usuario = $this->verificarEditorOAdmin();
         if (!$usuario) return;
@@ -166,7 +165,7 @@ class EditorController
 
         if (!Validator::positiveInt($id) || !$categoriaId || !$pregunta || !$opcionA || !$opcionB || !$opcionC || !$opcionD || !$respuestaCorrecta) {
             $_SESSION['error_editor'] = 'Completá todos los campos.';
-            Redirect::to('/editor/preguntas/editar?id=' . $id);
+            Redirect::to('/editor/editarPregunta/' . $id);
         }
 
         $this->preguntaModel->actualizar($id, [
@@ -183,7 +182,7 @@ class EditorController
         Redirect::to($backUrl);
     }
 
-    public function eliminar()
+    public function eliminarPregunta()
     {
         $usuario = $this->verificarEditorOAdmin();
         if (!$usuario) return;
@@ -202,7 +201,7 @@ class EditorController
         Redirect::to($this->backUrl($usuario));
     }
 
-    public function activar()
+    public function activarPregunta()
     {
         $usuario = $this->verificarEditorOAdmin();
         if (!$usuario) return;

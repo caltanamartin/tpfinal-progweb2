@@ -17,7 +17,7 @@ class PreguntaController
     {
         $usuario = $_SESSION['usuario'] ?? null;
         if (!$usuario) {
-            Redirect::to('/login');
+            Redirect::to('/auth/login');
         }
 
         $categorias = $this->preguntaModel->getCategorias();
@@ -39,7 +39,7 @@ class PreguntaController
     {
         $usuario = $_SESSION['usuario'] ?? null;
         if (!$usuario) {
-            Redirect::to('/login');
+            Redirect::to('/auth/login');
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {

@@ -41,14 +41,14 @@
                                             class="text-xs px-3 py-1.5 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer">
                                         Ver
                                     </button>
-                                    <form action="/editor/pendientes/aprobar" method="POST">
+                                    <form action="/editor/aprobarPendiente" method="POST">
                                         <input type="hidden" name="id" value="{{id}}">
                                         <button type="submit"
                                                 class="text-xs px-3 py-1.5 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors cursor-pointer">
                                             Aprobar
                                         </button>
                                     </form>
-                                    <form action="/editor/pendientes/rechazar" method="POST" onsubmit="return confirm('¿Eliminar esta pregunta permanentemente?')">
+                                    <form action="/editor/rechazarPendiente" method="POST" onsubmit="return confirm('¿Eliminar esta pregunta permanentemente?')">
                                         <input type="hidden" name="id" value="{{id}}">
                                         <button type="submit"
                                                 class="text-xs px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors cursor-pointer">

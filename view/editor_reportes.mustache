@@ -33,7 +33,7 @@
                             <td class="px-4 py-3 text-gray-500 text-xs">{{creado_en}}</td>
                             <td class="px-4 py-3 text-right">
                                 <div class="flex gap-2 justify-end">
-                                    <form action="/editor/reportes/aprobar" method="POST" onsubmit="return confirm('¿Aprobar reporte? La pregunta será desactivada.')">
+                                    <form action="/editor/aprobarReporte" method="POST" onsubmit="return confirm('¿Aprobar reporte? La pregunta será desactivada.')">
                                         <input type="hidden" name="reporte_id" value="{{id}}">
                                         <input type="hidden" name="pregunta_id" value="{{pregunta_id}}">
                                         <button type="submit"
@@ -41,7 +41,7 @@
                                             Aprobar (eliminar)
                                         </button>
                                     </form>
-                                    <form action="/editor/reportes/rechazar" method="POST">
+                                    <form action="/editor/rechazarReporte" method="POST">
                                         <input type="hidden" name="reporte_id" value="{{id}}">
                                         <button type="submit"
                                                 class="text-xs px-3 py-1.5 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-colors cursor-pointer">

@@ -1,6 +1,6 @@
 <?php
 
-class TrampitaController
+class TrampitasController
 {
     private $renderer;
     private $trampitaModel;
@@ -23,7 +23,7 @@ class TrampitaController
     {
         $usuario = $_SESSION['usuario'] ?? null;
         if (!$usuario) {
-            Redirect::to('/login');
+            Redirect::to('/auth/login');
             return null;
         }
         return $usuario;

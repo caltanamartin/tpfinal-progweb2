@@ -13,7 +13,7 @@ class AuthController
         $this->request = $request;
     }
 
-    public function verLogin()
+    public function login()
     {
         $data = ["esLogin" => true];
 
@@ -51,7 +51,7 @@ class AuthController
         $this->renderer->render("formLoginView", $data);
     }
 
-    public function verRegistro()
+    public function registro()
     {
         $data = ["esRegistro" => true];
 
@@ -108,7 +108,7 @@ class AuthController
                     Mailer::send($email, $subject, $body);
 
                     $_SESSION['exito'] = "Registrado correctamente. Revisá tu email para verificar la cuenta.";
-                    Redirect::to('/login');
+                    Redirect::to('/auth/login');
                 }
             }
         }
@@ -129,7 +129,7 @@ class AuthController
 
         $this->model->setVerificado($usuario['id']);
         $_SESSION['verificacion_exito'] = "Cuenta verificada correctamente. Ya podés iniciar sesión.";
-        Redirect::to('/login');
+        Redirect::to('/auth/login');
     }
 
     public function logout()

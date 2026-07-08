@@ -7,14 +7,16 @@ class AdminController
     private $partidaModel;
     private $preguntaModel;
     private $request;
+    private $trampitaController;
 
-    public function __construct($renderer, $usuarioModel, $partidaModel, $preguntaModel, $request)
+    public function __construct($renderer, $usuarioModel, $partidaModel, $preguntaModel, $request, $trampitaController)
     {
-        $this->renderer = $renderer;
-        $this->usuarioModel = $usuarioModel;
-        $this->partidaModel = $partidaModel;
-        $this->preguntaModel = $preguntaModel;
-        $this->request = $request;
+        $this->renderer          = $renderer;
+        $this->usuarioModel      = $usuarioModel;
+        $this->partidaModel      = $partidaModel;
+        $this->preguntaModel     = $preguntaModel;
+        $this->request           = $request;
+        $this->trampitaController = $trampitaController;
     }
 
     private function verificarAdmin()
@@ -122,6 +124,11 @@ class AdminController
         ];
 
         $this->renderer->render('admin_index', $data);
+    }
+
+    public function trampitas()
+    {
+        $this->trampitaController->adminListar();
     }
 
     private function buildPaginacion($actual, $totalPaginas, $param, $hash)

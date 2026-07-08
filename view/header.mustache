@@ -31,7 +31,7 @@
                 {{#usuario.esAdmin}}
                 <a href="/admin" class="text-sm font-medium text-purple-600 hover:text-purple-700 transition-colors duration-200">Panel admin</a>
                 {{/usuario.esAdmin}}
-                <a href="/logout"
+                <a href="/auth/logout"
                    class="text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer hover:opacity-70 text-[#272727]">
                     Cerrar sesión
                 </a>
@@ -40,7 +40,7 @@
                 <a
                     {{#esLogin}}href="/"{{/esLogin}}
                     {{#esRegistro}}href="/"{{/esRegistro}}
-                    {{#esHome}}href="/login"{{/esHome}}
+                    {{#esHome}}href="/auth/login"{{/esHome}}
                     class="text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer hover:opacity-70 text-[#272727]">
                     {{#esLogin}}Volver{{/esLogin}}
                     {{#esRegistro}}Volver{{/esRegistro}}
