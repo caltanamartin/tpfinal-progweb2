@@ -59,7 +59,7 @@ class PartidaModel
 
     public function getTotalPartidas($filtro = 'mes')
     {
-        $intervalo = $this->intervaloSql($filtro);
+        $intervalo = SqlHelper::intervaloSql($filtro);
         $sql = "SELECT COUNT(*) AS total FROM partidas WHERE estado = 'terminada' AND terminada_en >= DATE_SUB(NOW(), INTERVAL $intervalo)";
         $result = $this->database->queryPrepared($sql);
         return $result[0]['total'];
@@ -67,32 +67,13 @@ class PartidaModel
 
     public function getPartidasPorPeriodo($filtro = 'mes')
     {
-        $intervalo = $this->intervaloSql($filtro);
-        $formato = $this->formatoPeriodoSql($filtro, 'terminada_en');
+        $intervalo = SqlHelper::intervaloSql($filtro);
+        $formato = SqlHelper::formatoPeriodoSql($filtro, 'terminada_en');
         $sql = "SELECT $formato AS periodo, COUNT(*) AS total
                 FROM partidas
                 WHERE estado = 'terminada' AND terminada_en >= DATE_SUB(NOW(), INTERVAL $intervalo)
                 GROUP BY periodo ORDER BY periodo";
         return $this->database->queryPrepared($sql);
-    }
-
-    private function intervaloSql($filtro)
-    {
-        switch ($filtro) {
-            case 'dia': return '1 DAY';
-            case 'semana': return '1 WEEK';
-            case 'anio': return '1 YEAR';
-            default: return '1 MONTH';
-        }
-    }
-
-    private function formatoPeriodoSql($filtro, $columna)
-    {
-        switch ($filtro) {
-            case 'dia': return "DATE_FORMAT($columna, '%Y-%m-%d %H:00')";
-            case 'anio': return "DATE_FORMAT($columna, '%Y-%m')";
-            default: return "DATE($columna)";
-        }
     }
 
     public function getTodas($pagina = null, $porPagina = null)

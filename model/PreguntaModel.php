@@ -172,20 +172,10 @@ class PreguntaModel
 
     public function getTotalPreguntas($filtro = 'mes')
     {
-        $intervalo = $this->intervaloSql($filtro);
+        $intervalo = SqlHelper::intervaloSql($filtro);
         $sql = "SELECT COUNT(*) AS total FROM preguntas WHERE creado_en >= DATE_SUB(NOW(), INTERVAL $intervalo)";
         $result = $this->database->queryPrepared($sql);
         return $result[0]['total'];
-    }
-
-    private function intervaloSql($filtro)
-    {
-        switch ($filtro) {
-            case 'dia': return '1 DAY';
-            case 'semana': return '1 WEEK';
-            case 'anio': return '1 YEAR';
-            default: return '1 MONTH';
-        }
     }
 
     public function getCategorias()

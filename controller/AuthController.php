@@ -119,17 +119,10 @@ class AuthController
     public function verificar()
     {
         $token = $this->request->get('token');
-        $usuario = $this->model->findByToken($token);
-
-        if (!$usuario) {
-            $data['error'] = "El enlace de verificación no es válido o ya expiró.";
-            $this->renderer->render("formLoginView", $data);
-            return;
+        if ($token) {
+            Redirect::to('/verificar/' . $token);
         }
-
-        $this->model->setVerificado($usuario['id']);
-        $_SESSION['verificacion_exito'] = "Cuenta verificada correctamente. Ya podés iniciar sesión.";
-        Redirect::to('/auth/login');
+        Redirect::to('/');
     }
 
     public function logout()

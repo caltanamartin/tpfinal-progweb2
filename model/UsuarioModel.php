@@ -87,7 +87,7 @@ class UsuarioModel
 
     public function getTotalJugadores($filtro = 'mes')
     {
-        $intervalo = $this->intervaloSql($filtro);
+        $intervalo = SqlHelper::intervaloSql($filtro);
         $sql = "SELECT COUNT(*) AS total FROM usuarios WHERE verificado = 1 AND creado_en >= DATE_SUB(NOW(), INTERVAL $intervalo)";
         $result = $this->database->queryPrepared($sql);
         return $result[0]['total'];
@@ -95,8 +95,8 @@ class UsuarioModel
 
     public function getUsuariosNuevosPorPeriodo($filtro = 'mes')
     {
-        $intervalo = $this->intervaloSql($filtro);
-        $formato = $this->formatoPeriodoSql($filtro, 'creado_en');
+        $intervalo = SqlHelper::intervaloSql($filtro);
+        $formato = SqlHelper::formatoPeriodoSql($filtro, 'creado_en');
         $sql = "SELECT $formato AS periodo, COUNT(*) AS total
                 FROM usuarios
                 WHERE creado_en >= DATE_SUB(NOW(), INTERVAL $intervalo)
@@ -106,7 +106,7 @@ class UsuarioModel
 
     public function getUsuariosPorPais($filtro = 'mes')
     {
-        $intervalo = $this->intervaloSql($filtro);
+        $intervalo = SqlHelper::intervaloSql($filtro);
         $sql = "SELECT pais, COUNT(*) AS total
                 FROM usuarios
                 WHERE pais != '' AND creado_en >= DATE_SUB(NOW(), INTERVAL $intervalo)
@@ -124,7 +124,7 @@ class UsuarioModel
 
     public function getUsuariosPorSexo($filtro = 'mes')
     {
-        $intervalo = $this->intervaloSql($filtro);
+        $intervalo = SqlHelper::intervaloSql($filtro);
         $sql = "SELECT sexo, COUNT(*) AS total
                 FROM usuarios
                 WHERE creado_en >= DATE_SUB(NOW(), INTERVAL $intervalo)
@@ -134,7 +134,7 @@ class UsuarioModel
 
     public function getUsuariosPorEdad($filtro = 'mes')
     {
-        $intervalo = $this->intervaloSql($filtro);
+        $intervalo = SqlHelper::intervaloSql($filtro);
         $sql = "SELECT
                     CASE
                         WHEN anio_nacimiento IS NULL THEN 'Sin especificar'
@@ -152,7 +152,7 @@ class UsuarioModel
 
     public function getPorcentajeCorrectasPorUsuario($filtro = 'mes')
     {
-        $intervalo = $this->intervaloSql($filtro);
+        $intervalo = SqlHelper::intervaloSql($filtro);
         $sql = "SELECT u.id, u.username, u.nombre, u.foto_perfil,
                        COUNT(pp.id) AS total_respuestas,
                        IFNULL(SUM(pp.es_correcta), 0) AS respuestas_correctas,
@@ -164,25 +164,6 @@ class UsuarioModel
                 GROUP BY u.id
                 ORDER BY porcentaje DESC";
         return $this->database->queryPrepared($sql);
-    }
-
-    private function intervaloSql($filtro)
-    {
-        switch ($filtro) {
-            case 'dia': return '1 DAY';
-            case 'semana': return '1 WEEK';
-            case 'anio': return '1 YEAR';
-            default: return '1 MONTH';
-        }
-    }
-
-    private function formatoPeriodoSql($filtro, $columna)
-    {
-        switch ($filtro) {
-            case 'dia': return "DATE_FORMAT($columna, '%Y-%m-%d %H:00')";
-            case 'anio': return "DATE_FORMAT($columna, '%Y-%m')";
-            default: return "DATE($columna)";
-        }
     }
 
     public function contarTrampitas($usuarioId)

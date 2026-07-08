@@ -107,9 +107,9 @@ class AdminController
             'todosUsuarios' => $todosUsuarios,
             'todasPartidas' => $todasPartidas,
             'todasPreguntas' => $todasPreguntas,
-            'pagUsuarios' => $this->buildPaginacion($pageU, $usuariosRes['paginas'], 'page_usuarios', 'usuarios'),
-            'pagPartidas' => $this->buildPaginacion($pageP, $partidasRes['paginas'], 'page_partidas', 'partidas'),
-            'pagPreguntas' => $this->buildPaginacion($pageQ, $preguntasRes['paginas'], 'page_preguntas', 'preguntas'),
+            'pagUsuarios' => Pagination::build($pageU, $usuariosRes['paginas'], 'page_usuarios', 'usuarios'),
+            'pagPartidas' => Pagination::build($pageP, $partidasRes['paginas'], 'page_partidas', 'partidas'),
+            'pagPreguntas' => Pagination::build($pageQ, $preguntasRes['paginas'], 'page_preguntas', 'preguntas'),
         ];
 
         $this->renderer->render('admin_index', $data);
@@ -118,27 +118,6 @@ class AdminController
     public function trampitas()
     {
         $this->trampitaController->adminListar();
-    }
-
-    private function buildPaginacion($actual, $totalPaginas, $param, $hash)
-    {
-        $numeros = [];
-        $inicio = max(1, $actual - 2);
-        $fin = min($totalPaginas, $actual + 2);
-        for ($i = $inicio; $i <= $fin; $i++) {
-            $numeros[] = ['num' => $i, 'activa' => $i === $actual];
-        }
-        return [
-            'mostrar' => $totalPaginas > 1,
-            'actual' => $actual,
-            'anterior' => $actual > 1,
-            'siguiente' => $actual < $totalPaginas,
-            'prevPage' => $actual - 1,
-            'nextPage' => $actual + 1,
-            'numeros' => $numeros,
-            'param' => $param,
-            'hash' => $hash,
-        ];
     }
 
     private function combinarSeries($usuarios, $partidas)

@@ -15,27 +15,6 @@ class EditorController
         $this->request = $request;
     }
 
-    private function buildPaginacion($actual, $totalPaginas, $param, $hash)
-    {
-        $numeros = [];
-        $inicio = max(1, $actual - 2);
-        $fin = min($totalPaginas, $actual + 2);
-        for ($i = $inicio; $i <= $fin; $i++) {
-            $numeros[] = ['num' => $i, 'activa' => $i === $actual];
-        }
-        return [
-            'mostrar' => $totalPaginas > 1,
-            'actual' => $actual,
-            'anterior' => $actual > 1,
-            'siguiente' => $actual < $totalPaginas,
-            'prevPage' => $actual - 1,
-            'nextPage' => $actual + 1,
-            'numeros' => $numeros,
-            'param' => $param,
-            'hash' => $hash,
-        ];
-    }
-
     private function backUrl($usuario)
     {
         return ($usuario['rol'] === 'admin') ? '/admin#preguntas' : '/editor/preguntas';
@@ -74,7 +53,7 @@ class EditorController
             'esAdmin' => ($usuario['rol'] === 'admin'),
             'preguntas' => $preguntas,
             'backUrl' => $this->backUrl($usuario),
-            'pag' => $this->buildPaginacion($page, $res['paginas'], 'page', ''),
+            'pag' => Pagination::build($page, $res['paginas'], 'page', ''),
         ];
 
         $this->renderer->render('editor_preguntas', $data);
@@ -210,7 +189,7 @@ class EditorController
             'esEditor' => ($usuario['rol'] === 'editor'),
             'reportes' => $res['filas'],
             'exito' => $exito,
-            'pag' => $this->buildPaginacion($page, $res['paginas'], 'page', ''),
+            'pag' => Pagination::build($page, $res['paginas'], 'page', ''),
         ];
 
         $this->renderer->render('editor_reportes', $data);
@@ -281,7 +260,7 @@ class EditorController
             'esEditor' => ($usuario['rol'] === 'editor'),
             'pendientes' => $pendientes,
             'exito' => $exito,
-            'pag' => $this->buildPaginacion($page, $res['paginas'], 'page', ''),
+            'pag' => Pagination::build($page, $res['paginas'], 'page', ''),
         ];
 
         $this->renderer->render('editor_pendientes', $data);
