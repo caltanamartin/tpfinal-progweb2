@@ -25,15 +25,15 @@ class PerfilController
                 Redirect::to('/ranking');
             }
 
-            $esPropio = isset($_SESSION['usuario']) && $_SESSION['usuario']['id'] == $id;
+            $logueado = Auth::usuario();
+            $esPropio = $logueado && $logueado['id'] == $id;
 
             if ($esPropio) {
                 Redirect::to('/perfil');
             }
 
-            $logueado = $_SESSION['usuario'] ?? null;
-            $usuario['esEditor'] = $logueado && $logueado['rol'] === 'editor';
-            $usuario['esAdmin'] = $logueado && $logueado['rol'] === 'admin';
+            $usuario['esEditor'] = Auth::esEditor();
+            $usuario['esAdmin'] = Auth::esAdmin();
             $qrUrl = $this->buildQrUrl($usuario['id']);
 
             $this->renderer->render("perfil", [
@@ -45,15 +45,11 @@ class PerfilController
             return;
         }
 
-        $usuario = $_SESSION['usuario'] ?? null;
-        
-        if (!$usuario) {
-            Redirect::to('/auth/login');
-        }
+        $usuario = Auth::requerirLogin();
 
         $usuario = $this->model->getUsuarioConEstadisticas($usuario['id']);
-        $usuario['esEditor'] = ($_SESSION['usuario']['rol'] ?? 'usuario') === 'editor';
-        $usuario['esAdmin'] = ($_SESSION['usuario']['rol'] ?? 'usuario') === 'admin';
+        $usuario['esEditor'] = Auth::esEditor();
+        $usuario['esAdmin'] = Auth::esAdmin();
         $qrUrl = $this->buildQrUrl($usuario['id']);
         
         $this->renderer->render("perfil", [
@@ -66,11 +62,7 @@ class PerfilController
 
     public function editar()
     {
-        $usuario = $_SESSION['usuario'] ?? null;
-
-        if (!$usuario) {
-            Redirect::to('/auth/login');
-        }
+        $usuario = Auth::requerirLogin();
 
         $data = [];
 

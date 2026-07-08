@@ -15,26 +15,6 @@ class EditorController
         $this->request = $request;
     }
 
-    private function verificarEditor()
-    {
-        $usuario = $_SESSION['usuario'] ?? null;
-        if (!$usuario || ($usuario['rol'] ?? 'usuario') !== 'editor') {
-            Redirect::to('/');
-            return null;
-        }
-        return $usuario;
-    }
-
-    private function verificarEditorOAdmin()
-    {
-        $usuario = $_SESSION['usuario'] ?? null;
-        if (!$usuario || !in_array($usuario['rol'] ?? '', ['editor', 'admin'])) {
-            Redirect::to('/');
-            return null;
-        }
-        return $usuario;
-    }
-
     private function buildPaginacion($actual, $totalPaginas, $param, $hash)
     {
         $numeros = [];
@@ -63,8 +43,7 @@ class EditorController
 
     public function index()
     {
-        $usuario = $this->verificarEditorOAdmin();
-        if (!$usuario) return;
+        $usuario = Auth::requerirEditorOAdmin();
 
         $data = [
             'usuario' => $usuario,
@@ -76,8 +55,7 @@ class EditorController
 
     public function preguntas()
     {
-        $usuario = $this->verificarEditorOAdmin();
-        if (!$usuario) return;
+        $usuario = Auth::requerirEditorOAdmin();
 
         $porPagina = 15;
         $page = max(1, (int)$this->request->get('page', 1));
@@ -104,8 +82,7 @@ class EditorController
 
     public function editarPregunta($id = null)
     {
-        $usuario = $this->verificarEditorOAdmin();
-        if (!$usuario) return;
+        $usuario = Auth::requerirEditorOAdmin();
 
         if (!Validator::positiveInt($id)) {
             Redirect::to($this->backUrl($usuario));
@@ -145,8 +122,7 @@ class EditorController
 
     public function guardarPregunta()
     {
-        $usuario = $this->verificarEditorOAdmin();
-        if (!$usuario) return;
+        $usuario = Auth::requerirEditorOAdmin();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Redirect::to($this->backUrl($usuario));
@@ -184,8 +160,7 @@ class EditorController
 
     public function eliminarPregunta()
     {
-        $usuario = $this->verificarEditorOAdmin();
-        if (!$usuario) return;
+        $usuario = Auth::requerirEditorOAdmin();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Redirect::to($this->backUrl($usuario));
@@ -203,8 +178,7 @@ class EditorController
 
     public function activarPregunta()
     {
-        $usuario = $this->verificarEditorOAdmin();
-        if (!$usuario) return;
+        $usuario = Auth::requerirEditorOAdmin();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Redirect::to($this->backUrl($usuario));
@@ -222,8 +196,7 @@ class EditorController
 
     public function reportes()
     {
-        $usuario = $this->verificarEditorOAdmin();
-        if (!$usuario) return;
+        $usuario = Auth::requerirEditorOAdmin();
 
         $porPagina = 15;
         $page = max(1, (int)$this->request->get('page', 1));
@@ -245,8 +218,7 @@ class EditorController
 
     public function aprobarReporte()
     {
-        $usuario = $this->verificarEditorOAdmin();
-        if (!$usuario) return;
+        $usuario = Auth::requerirEditorOAdmin();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Redirect::to('/editor/reportes');
@@ -268,8 +240,7 @@ class EditorController
 
     public function rechazarReporte()
     {
-        $usuario = $this->verificarEditorOAdmin();
-        if (!$usuario) return;
+        $usuario = Auth::requerirEditorOAdmin();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Redirect::to('/editor/reportes');
@@ -289,8 +260,7 @@ class EditorController
 
     public function pendientes()
     {
-        $usuario = $this->verificarEditorOAdmin();
-        if (!$usuario) return;
+        $usuario = Auth::requerirEditorOAdmin();
 
         $porPagina = 15;
         $page = max(1, (int)$this->request->get('page', 1));
@@ -319,8 +289,7 @@ class EditorController
 
     public function aprobarPendiente()
     {
-        $usuario = $this->verificarEditorOAdmin();
-        if (!$usuario) return;
+        $usuario = Auth::requerirEditorOAdmin();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Redirect::to('/editor/pendientes');
@@ -338,8 +307,7 @@ class EditorController
 
     public function rechazarPendiente()
     {
-        $usuario = $this->verificarEditorOAdmin();
-        if (!$usuario) return;
+        $usuario = Auth::requerirEditorOAdmin();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Redirect::to('/editor/pendientes');

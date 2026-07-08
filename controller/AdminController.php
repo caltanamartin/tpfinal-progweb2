@@ -19,20 +19,9 @@ class AdminController
         $this->trampitaController = $trampitaController;
     }
 
-    private function verificarAdmin()
-    {
-        $usuario = $_SESSION['usuario'] ?? null;
-        if (!$usuario || ($usuario['rol'] ?? 'usuario') !== 'admin') {
-            Redirect::to('/');
-            return null;
-        }
-        return $usuario;
-    }
-
     public function index()
     {
-        $usuario = $this->verificarAdmin();
-        if (!$usuario) return;
+        $usuario = Auth::requerirAdmin();
 
         $filtro = $this->request->get('filtro', 'mes');
         if (!in_array($filtro, ['dia', 'semana', 'mes', 'anio'])) {

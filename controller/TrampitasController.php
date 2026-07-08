@@ -19,20 +19,9 @@ class TrampitasController
         $this->request = $request;
     }
 
-    private function verificarUsuario()
-    {
-        $usuario = $_SESSION['usuario'] ?? null;
-        if (!$usuario) {
-            Redirect::to('/auth/login');
-            return null;
-        }
-        return $usuario;
-    }
-
     public function index()
     {
-        $usuario = $this->verificarUsuario();
-        if (!$usuario) return;
+        $usuario = Auth::requerirLogin();
 
         $tipos = $this->trampitaModel->getTipos();
         $stockRaw = $this->trampitaModel->contarDisponibles($usuario['id']);
@@ -66,8 +55,7 @@ class TrampitasController
 
     public function comprar()
     {
-        $usuario = $this->verificarUsuario();
-        if (!$usuario) return;
+        $usuario = Auth::requerirLogin();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $tipo = $this->request->post('tipo');
@@ -159,8 +147,7 @@ class TrampitasController
 
     public function usar()
     {
-        $usuario = $this->verificarUsuario();
-        if (!$usuario) return;
+        $usuario = Auth::requerirLogin();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Redirect::to('/');
@@ -231,10 +218,7 @@ class TrampitasController
 
     public function adminListar()
     {
-        $usuario = $_SESSION['usuario'] ?? null;
-        if (!$usuario || ($usuario['rol'] ?? 'usuario') !== 'admin') {
-            Redirect::to('/');
-        }
+        $usuario = Auth::requerirAdmin();
 
         $page = max(1, (int)$this->request->get('page', 1));
         $porPagina = 10;

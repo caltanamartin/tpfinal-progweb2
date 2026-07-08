@@ -15,10 +15,7 @@ class PreguntaController
 
     public function crear()
     {
-        $usuario = $_SESSION['usuario'] ?? null;
-        if (!$usuario) {
-            Redirect::to('/auth/login');
-        }
+        $usuario = Auth::requerirLogin();
 
         $categorias = $this->preguntaModel->getCategorias();
 
@@ -37,10 +34,7 @@ class PreguntaController
 
     public function guardar()
     {
-        $usuario = $_SESSION['usuario'] ?? null;
-        if (!$usuario) {
-            Redirect::to('/auth/login');
-        }
+        $usuario = Auth::requerirLogin();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $categoriaId = $this->request->post('categoria_id');

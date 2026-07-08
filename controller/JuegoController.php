@@ -21,10 +21,7 @@ class JuegoController
 
     public function nueva()
     {
-        $usuario = $_SESSION['usuario'] ?? null;
-        if (!$usuario) {
-            Redirect::to('/auth/login');
-        }
+        $usuario = Auth::requerirLogin();
 
         $partidaEnCurso = $this->partidaModel->tienePartidaEnCurso($usuario['id']);
         if ($partidaEnCurso) {
@@ -37,10 +34,7 @@ class JuegoController
 
     public function categoria()
     {
-        $usuario = $_SESSION['usuario'] ?? null;
-        if (!$usuario) {
-            Redirect::to('/auth/login');
-        }
+        $usuario = Auth::requerirLogin();
 
         $partidaId = $_REQUEST['id'] ?? null;
         if (!Validator::positiveInt($partidaId)) {
@@ -84,10 +78,7 @@ class JuegoController
 
     public function index()
     {
-        $usuario = $_SESSION['usuario'] ?? null;
-        if (!$usuario) {
-            Redirect::to('/auth/login');
-        }
+        $usuario = Auth::requerirLogin();
 
         $partidaId = $this->request->get('id');
         if (!Validator::positiveInt($partidaId)) {
@@ -206,10 +197,7 @@ class JuegoController
 
     public function responder()
     {
-        $usuario = $_SESSION['usuario'] ?? null;
-        if (!$usuario) {
-            Redirect::to('/auth/login');
-        }
+        $usuario = Auth::requerirLogin();
 
         $respuesta = strtoupper($this->request->post('respuesta'));
         $sessionPartida = $_SESSION['partida_actual'] ?? null;
@@ -281,10 +269,7 @@ class JuegoController
 
     public function tiempo()
     {
-        $usuario = $_SESSION['usuario'] ?? null;
-        if (!$usuario) {
-            Redirect::to('/auth/login');
-        }
+        $usuario = Auth::requerirLogin();
 
         $sessionPartida = $_SESSION['partida_actual'] ?? null;
         if (!$sessionPartida) {
@@ -332,10 +317,7 @@ class JuegoController
 
     public function cancelar()
     {
-        $usuario = $_SESSION['usuario'] ?? null;
-        if (!$usuario) {
-            Redirect::to('/auth/login');
-        }
+        $usuario = Auth::requerirLogin();
 
         $partidaId = $this->request->get('id');
         if (!Validator::positiveInt($partidaId)) {
@@ -357,10 +339,7 @@ class JuegoController
 
     public function reportar()
     {
-        $usuario = $_SESSION['usuario'] ?? null;
-        if (!$usuario) {
-            Redirect::to('/auth/login');
-        }
+        $usuario = Auth::requerirLogin();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Redirect::to('/');
@@ -391,10 +370,7 @@ class JuegoController
 
     public function resultado()
     {
-        $usuario = $_SESSION['usuario'] ?? null;
-        if (!$usuario) {
-            Redirect::to('/auth/login');
-        }
+        $usuario = Auth::requerirLogin();
 
         $partidaId = $this->request->get('id');
         if (!Validator::positiveInt($partidaId)) {

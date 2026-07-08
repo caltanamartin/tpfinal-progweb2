@@ -13,7 +13,7 @@ class RankingController
 
     public function ver()
     {
-        $usuario = $_SESSION['usuario'] ?? null;
+        $usuario = Auth::usuario();
         $rolFiltro = ($usuario && $usuario['rol'] === 'usuario') ? 'usuario' : null;
         $usuarios = $this->usuarioModel->getRanking(50, $rolFiltro);
 

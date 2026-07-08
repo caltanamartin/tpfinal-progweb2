@@ -17,7 +17,7 @@ class HomeController
 
     public function ver()
     {
-        $usuario = $_SESSION['usuario'] ?? null;
+        $usuario = Auth::usuario();
         $data = ["esHome" => true];
         if ($usuario && $this->partidaModel) {
             $data["usuario"] = $usuario;
