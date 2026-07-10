@@ -117,7 +117,7 @@ class PerfilController
         $usuario['sexoFemenino'] = $usuario['sexo'] === 'Femenino';
         $usuario['sexoOtro'] = !$usuario['sexoMasculino'] && !$usuario['sexoFemenino'];
 
-        $this->renderer->render("formEditarPerfilView", [
+        $this->renderer->render("form_editar_perfil", [
             "usuario" => $usuario,
             "esPerfil" => true,
             "error" => $data['error'],

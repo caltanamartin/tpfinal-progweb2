@@ -48,7 +48,7 @@ class AuthController
             }
         }
 
-        $this->renderer->render("formLoginView", $data);
+        $this->renderer->render("form_login", $data);
     }
 
     public function registro()
@@ -113,7 +113,7 @@ class AuthController
             }
         }
 
-        $this->renderer->render("formRegistrationView", $data);
+        $this->renderer->render("form_registro", $data);
     }
 
     public function verificar()

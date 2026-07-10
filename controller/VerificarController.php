@@ -16,7 +16,7 @@ class VerificarController
 
         if (!$usuario) {
             $data['error'] = "El enlace de verificación no es válido o ya expiró.";
-            $this->renderer->render("formLoginView", $data);
+            $this->renderer->render("form_login", $data);
             return;
         }
 
