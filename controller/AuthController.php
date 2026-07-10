@@ -41,7 +41,7 @@ class AuthController
                     $_SESSION['usuario'] = $usuario;
                     $_SESSION['usuario']['esEditor'] = ($usuario['rol'] === 'editor');
                     $_SESSION['usuario']['esAdmin'] = ($usuario['rol'] === 'admin');
-                    Redirect::to('/');
+                    Redirect::toIndex();
                 }
             } else {
                 $data['error'] = "Usuario o contraseña incorrectos.";
@@ -122,12 +122,12 @@ class AuthController
         if ($token) {
             Redirect::to('/verificar/' . $token);
         }
-        Redirect::to('/');
+        Redirect::toIndex();
     }
 
     public function logout()
     {
         session_destroy();
-        Redirect::to('/');
+        Redirect::toIndex();
     }
 }

@@ -20,7 +20,7 @@ class Auth
     {
         $usuario = self::requerirLogin();
         if ($usuario['rol'] !== 'admin') {
-            Redirect::to('/');
+            Redirect::toIndex();
         }
         return $usuario;
     }
@@ -29,7 +29,7 @@ class Auth
     {
         $usuario = self::requerirLogin();
         if ($usuario['rol'] !== 'editor') {
-            Redirect::to('/');
+            Redirect::toIndex();
         }
         return $usuario;
     }
@@ -38,7 +38,7 @@ class Auth
     {
         $usuario = self::requerirLogin();
         if (!in_array($usuario['rol'], ['editor', 'admin'])) {
-            Redirect::to('/');
+            Redirect::toIndex();
         }
         return $usuario;
     }

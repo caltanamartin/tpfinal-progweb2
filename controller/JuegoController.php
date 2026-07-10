@@ -40,12 +40,12 @@ class JuegoController
 
         $partidaId = $_REQUEST['id'] ?? null;
         if (!Validator::positiveInt($partidaId)) {
-            Redirect::to('/');
+            Redirect::toIndex();
         }
         $partida = $this->partidaModel->obtener($partidaId);
 
         if (!$partida || $partida['usuario_id'] != $usuario['id']) {
-            Redirect::to('/');
+            Redirect::toIndex();
         }
 
         if ($partida['estado'] === 'terminada') {
@@ -84,12 +84,12 @@ class JuegoController
 
         $partidaId = $this->request->get('id');
         if (!Validator::positiveInt($partidaId)) {
-            Redirect::to('/');
+            Redirect::toIndex();
         }
         $partida = $this->partidaModel->obtener($partidaId);
 
         if (!$partida || $partida['usuario_id'] != $usuario['id']) { 
-            Redirect::to('/');
+            Redirect::toIndex();
         }
 
         if ($partida['estado'] === 'terminada') { 
@@ -206,7 +206,7 @@ class JuegoController
         $sessionPartida = $_SESSION['partida_actual'] ?? null;
 
         if (!$sessionPartida) {
-            Redirect::to('/');
+            Redirect::toIndex();
         }
 
         $partidaId = $sessionPartida['partida_id'];
@@ -216,7 +216,7 @@ class JuegoController
         $partida = $this->partidaModel->obtener($partidaId);
         if (!$partida || $partida['usuario_id'] != $usuario['id']) {
             unset($_SESSION['partida_actual']);
-            Redirect::to('/');
+            Redirect::toIndex();
         }
 
         if ($partida['estado'] === 'terminada') {
@@ -258,7 +258,7 @@ class JuegoController
 
         $sessionPartida = $_SESSION['partida_actual'] ?? null;
         if (!$sessionPartida) {
-            Redirect::to('/');
+            Redirect::toIndex();
         }
 
         $partidaId = $sessionPartida['partida_id'];
@@ -268,7 +268,7 @@ class JuegoController
         $partida = $this->partidaModel->obtener($partidaId);
         if (!$partida || $partida['usuario_id'] != $usuario['id']) {
             unset($_SESSION['partida_actual']);
-            Redirect::to('/');
+            Redirect::toIndex();
         }
 
         if ($partida['estado'] === 'terminada') {
@@ -297,12 +297,12 @@ class JuegoController
 
         $partidaId = $this->request->get('id');
         if (!Validator::positiveInt($partidaId)) {
-            Redirect::to('/');
+            Redirect::toIndex();
         }
 
         $partida = $this->partidaModel->obtener($partidaId);
         if (!$partida || $partida['usuario_id'] != $usuario['id']) {
-            Redirect::to('/');
+            Redirect::toIndex();
         }
 
         if ($partida['estado'] === 'jugando') {
@@ -310,7 +310,7 @@ class JuegoController
         }
 
         unset($_SESSION['partida_actual']);
-        Redirect::to('/');
+        Redirect::toIndex();
     }
 
     public function reportar()
@@ -318,19 +318,19 @@ class JuegoController
         $usuario = Auth::requerirLogin();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            Redirect::to('/');
+            Redirect::toIndex();
         }
 
         $preguntaId = $this->request->post('pregunta_id');
 
         if (!Validator::positiveInt($preguntaId)) {
-            Redirect::to('/');
+            Redirect::toIndex();
         }
 
         $motivo = $this->request->post('motivo');
 
         if (!$preguntaId) {
-            Redirect::to('/');
+            Redirect::toIndex();
         }
 
         $this->preguntaModel->reportar($preguntaId, $usuario['id'], $motivo);
@@ -341,7 +341,7 @@ class JuegoController
         if ($partidaId) {
             Redirect::to('/juego?id=' . $partidaId);
         }
-        Redirect::to('/');
+        Redirect::toIndex();
     }
 
     public function resultado()
@@ -350,12 +350,12 @@ class JuegoController
 
         $partidaId = $this->request->get('id');
         if (!Validator::positiveInt($partidaId)) {
-            Redirect::to('/');
+            Redirect::toIndex();
         }
         $partida = $this->partidaModel->obtener($partidaId);
 
         if (!$partida || $partida['usuario_id'] != $usuario['id']) {
-            Redirect::to('/');
+            Redirect::toIndex();
         }
 
         $huboTimeout = $_SESSION['hubo_timeout'] ?? false;

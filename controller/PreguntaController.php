@@ -58,7 +58,7 @@ class PreguntaController
             } else {
                 $_SESSION['exito_pregunta'] = 'Pregunta enviada. Un editor la revisará para aprobarla.';
             }
-            Redirect::to('/');
+            Redirect::toIndex();
         }
     }
 }

@@ -3,6 +3,7 @@
 class VerificarController
 {
     private $model;
+    private $renderer;
 
     public function __construct($model, $renderer)
     {
