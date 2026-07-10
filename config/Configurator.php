@@ -8,13 +8,8 @@ class Configurator {
         $this->config = parse_ini_file("config/config.ini");
     }
 
-    public function getVikingoController()
-    {
-        return new VikingoController($this->getVikingoModel(), $this->getRenderer(), new Request());
-    }
-
     public function getHomeController() {
-        return new HomeController($this->getRenderer(), $this->getPartidaModel(), $this->getPreguntaModel(), $this->getTrampitaModel(), $this->getUsuarioModel());
+        return new HomeController($this->getRenderer(), $this->getPartidaModel(), $this->getTrampitaModel(), $this->getUsuarioModel());
     }
 
     public function getRankingController() {
@@ -93,11 +88,6 @@ class Configurator {
     private function getRenderer()
     {
         return new MustacheRenderer(__DIR__ . '/../view');
-    }
-
-    private function getVikingoModel()
-    {
-        return new VikingoModel($this->getDatabase());
     }
 
     private function getUsuarioModel()

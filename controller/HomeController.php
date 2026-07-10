@@ -4,15 +4,13 @@ class HomeController
 {
     private $renderer;
     private $partidaModel;
-    private $preguntaModel;
     private $trampitaModel;
     private $usuarioModel;
 
-    public function __construct($renderer, $partidaModel = null, $preguntaModel = null, $trampitaModel = null, $usuarioModel = null)
+    public function __construct($renderer, $partidaModel = null, $trampitaModel = null, $usuarioModel = null)
     {
         $this->renderer = $renderer;
         $this->partidaModel = $partidaModel;
-        $this->preguntaModel = $preguntaModel;
         $this->trampitaModel = $trampitaModel;
         $this->usuarioModel = $usuarioModel;
     }
@@ -31,7 +29,7 @@ class HomeController
             }
             $data["partidas"] = $partidas;
 
-            if ($this->preguntaModel) {
+            if ($this->usuarioModel) {
                 $nivel = $this->usuarioModel->calcularNivelUsuario($usuario['id']);
                 if ($nivel === 0.5) {
                     $data['nivelLabel'] = 'En evaluación';
@@ -60,7 +58,8 @@ class HomeController
         } elseif ($usuario) {
             $data["usuario"] = $usuario;
         }
-
+        
+        // flash message de sugerencia/creación de pregunta
         $exitoPregunta = $_SESSION['exito_pregunta'] ?? null;
         unset($_SESSION['exito_pregunta']);
         if ($exitoPregunta) {
