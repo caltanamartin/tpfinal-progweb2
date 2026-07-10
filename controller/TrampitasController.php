@@ -150,25 +150,25 @@ class TrampitasController
         $usuario = Auth::requerirLogin();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            Redirect::to('/');
+            Redirect::toIndex();
         }
 
         $tipo = $this->request->post('tipo');
         $tiposValidos = ['50/50', 'skip', 'congelar_tiempo'];
         if (!in_array($tipo, $tiposValidos)) {
-            Redirect::to('/');
+            Redirect::toIndex();
         }
 
         $sessionPartida = $_SESSION['partida_actual'] ?? null;
         if (!$sessionPartida) {
-            Redirect::to('/');
+            Redirect::toIndex();
         }
 
         $partidaId = $sessionPartida['partida_id'];
         $partida = $this->partidaModel->obtener($partidaId);
         if (!$partida || $partida['usuario_id'] != $usuario['id']) {
             unset($_SESSION['partida_actual']);
-            Redirect::to('/');
+            Redirect::toIndex();
         }
 
         if ($partida['estado'] === 'terminada') {
