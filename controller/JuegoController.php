@@ -7,9 +7,10 @@ class JuegoController
     private $preguntaModel;
     private $partidaPreguntaModel;
     private $trampitaModel;
+    private $usuarioModel;
     private $request;
 
-    public function __construct($renderer, $partidaModel, $preguntaModel, $partidaPreguntaModel, $request, $trampitaModel = null)
+    public function __construct($renderer, $partidaModel, $preguntaModel, $partidaPreguntaModel, $request, $trampitaModel = null, $usuarioModel = null)
     {
         $this->renderer = $renderer;
         $this->partidaModel = $partidaModel;
@@ -17,6 +18,7 @@ class JuegoController
         $this->partidaPreguntaModel = $partidaPreguntaModel;
         $this->request = $request;
         $this->trampitaModel = $trampitaModel;
+        $this->usuarioModel = $usuarioModel;
     }
 
     public function nueva()
@@ -109,7 +111,8 @@ class JuegoController
                 Redirect::to('/juego/categoria?id=' . $partidaId);
             }
 
-            $pregunta = $this->preguntaModel->getPreguntaAleatoria($partidaId, $usuario['id'], $categoriaId);
+            $nivel = $this->usuarioModel->calcularNivelUsuario($usuario['id']);
+            $pregunta = $this->preguntaModel->getPreguntaAleatoria($partidaId, $nivel, $categoriaId);
 
             if (!$pregunta) {
                 $_SESSION['error_categoria'] = 'No hay más preguntas de esta categoría. Elegí otra.';

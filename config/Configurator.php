@@ -14,7 +14,7 @@ class Configurator {
     }
 
     public function getHomeController() {
-        return new HomeController($this->getRenderer(), $this->getPartidaModel(), $this->getPreguntaModel(), $this->getTrampitaModel());
+        return new HomeController($this->getRenderer(), $this->getPartidaModel(), $this->getPreguntaModel(), $this->getTrampitaModel(), $this->getUsuarioModel());
     }
 
     public function getRankingController() {
@@ -75,7 +75,8 @@ class Configurator {
             $this->getPreguntaModel(),
             $this->getPartidaPreguntaModel(),
             new Request(),
-            $this->getTrampitaModel()
+            $this->getTrampitaModel(),
+            $this->getUsuarioModel()
         );
     }
 

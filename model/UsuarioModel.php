@@ -166,6 +166,23 @@ class UsuarioModel
         return $this->database->queryPrepared($sql);
     }
 
+    public function calcularNivelUsuario($usuarioId)
+    {
+        $sql = "SELECT COUNT(*) AS total,
+                       IFNULL(SUM(es_correcta), 0) AS correctas
+                FROM partidas_preguntas pp
+                JOIN partidas p ON p.id = pp.partida_id
+                WHERE p.usuario_id = ? AND pp.respuesta IS NOT NULL";
+        $result = $this->database->queryPrepared($sql, [$usuarioId]);
+        $total = (int)$result[0]['total'];
+
+        if ($total < 5) {
+            return 0.5;
+        }
+
+        return (int)$result[0]['correctas'] / $total;
+    }
+
     public function contarTrampitas($usuarioId)
     {
         $sql = "SELECT COUNT(*) AS total FROM trampitas_compradas WHERE usuario_id = ?";

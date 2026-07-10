@@ -6,13 +6,15 @@ class HomeController
     private $partidaModel;
     private $preguntaModel;
     private $trampitaModel;
+    private $usuarioModel;
 
-    public function __construct($renderer, $partidaModel = null, $preguntaModel = null, $trampitaModel = null)
+    public function __construct($renderer, $partidaModel = null, $preguntaModel = null, $trampitaModel = null, $usuarioModel = null)
     {
         $this->renderer = $renderer;
         $this->partidaModel = $partidaModel;
         $this->preguntaModel = $preguntaModel;
         $this->trampitaModel = $trampitaModel;
+        $this->usuarioModel = $usuarioModel;
     }
 
     public function ver()
@@ -30,7 +32,7 @@ class HomeController
             $data["partidas"] = $partidas;
 
             if ($this->preguntaModel) {
-                $nivel = $this->preguntaModel->calcularNivelUsuario($usuario['id']);
+                $nivel = $this->usuarioModel->calcularNivelUsuario($usuario['id']);
                 if ($nivel === 0.5) {
                     $data['nivelLabel'] = 'En evaluación';
                     $data['nivelClass'] = 'bg-gray-200 text-gray-600';

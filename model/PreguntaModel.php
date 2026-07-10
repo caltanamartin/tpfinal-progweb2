@@ -10,9 +10,8 @@ class PreguntaModel
         $this->database = $database;
     }
 
-    public function getPreguntaAleatoria($partidaId, $usuarioId, $categoriaId = null)
+    public function getPreguntaAleatoria($partidaId, $nivelUsuario, $categoriaId = null)
     {
-        $nivelUsuario = $this->calcularNivelUsuario($usuarioId);
         $distribucion = $this->obtenerDistribucion($nivelUsuario);
 
         $rand = rand(1, 100);
@@ -126,23 +125,6 @@ class PreguntaModel
         } else {
             return [15 => 'dificil', 65 => 'media', 80 => 'facil', 100 => 'neutra'];
         }
-    }
-
-    public function calcularNivelUsuario($usuarioId)
-    {
-        $sql = "SELECT COUNT(*) AS total,
-                       IFNULL(SUM(es_correcta), 0) AS correctas
-                FROM partidas_preguntas pp
-                JOIN partidas p ON p.id = pp.partida_id
-                WHERE p.usuario_id = ? AND pp.respuesta IS NOT NULL";
-        $result = $this->database->queryPrepared($sql, [$usuarioId]);
-        $total = (int)$result[0]['total'];
-
-        if ($total < 5) {
-            return 0.5;
-        }
-
-        return (int)$result[0]['correctas'] / $total;
     }
 
     private function obtenerIdsVistosEnPartida($partidaId)
