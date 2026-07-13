@@ -51,7 +51,8 @@ class PreguntaController
             }
 
             $rol = $usuario['rol'] ?? 'usuario';
-            $this->preguntaModel->crear($categoriaId, $pregunta, $opcionA, $opcionB, $opcionC, $opcionD, $respuestaCorrecta, $usuario['id'], $rol);
+            $activa = ($rol === 'editor' || $rol === 'admin') ? 1 : 0;
+            $this->preguntaModel->crear($categoriaId, $pregunta, $opcionA, $opcionB, $opcionC, $opcionD, $respuestaCorrecta, $usuario['id'], $activa);
 
             if ($rol === 'editor' || $rol === 'admin') {
                 $_SESSION['exito_pregunta'] = 'Pregunta creada correctamente. Ya está disponible en el juego.';

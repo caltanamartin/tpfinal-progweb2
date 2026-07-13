@@ -172,9 +172,8 @@ class PreguntaModel
         return $this->database->executePrepared($sql, [$preguntaId, $usuarioId, $motivo ?: '']);
     }
 
-    public function crear($categoriaId, $pregunta, $opcionA, $opcionB, $opcionC, $opcionD, $respuestaCorrecta, $creadorId = null, $rol = 'usuario')
+    public function crear($categoriaId, $pregunta, $opcionA, $opcionB, $opcionC, $opcionD, $respuestaCorrecta, $creadorId = null, $activa = 0)
     {
-        $activa = ($rol === 'editor' || $rol === 'admin') ? 1 : 0;
         $sql = "INSERT INTO preguntas (categoria_id, pregunta, opcion_a, opcion_b, opcion_c, opcion_d, respuesta_correcta, activa, creador_id)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         return $this->database->executePrepared($sql, [$categoriaId, $pregunta, $opcionA, $opcionB, $opcionC, $opcionD, $respuestaCorrecta, $activa, $creadorId]);
