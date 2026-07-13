@@ -4,15 +4,18 @@ class VerificarController
 {
     private $model;
     private $renderer;
+    private $request;
 
-    public function __construct($model, $renderer)
+    public function __construct($model, $renderer, $request)
     {
         $this->model    = $model;
         $this->renderer = $renderer;
+        $this->request  = $request;
     }
 
-    public function verificar($token)
+    public function verificar()
     {
+        $token = $this->request->get('token');
         $usuario = $this->model->findByToken($token);
 
         if (!$usuario) {

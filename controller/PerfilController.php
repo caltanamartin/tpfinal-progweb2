@@ -13,8 +13,9 @@ class PerfilController
         $this->request = $request;
     }
 
-    public function index($id = null)
+    public function index()
     {
+        $id = $this->request->get('id');
         if ($id) {
             if (!Validator::positiveInt($id)) {
                 Redirect::to('/ranking');
@@ -127,7 +128,7 @@ class PerfilController
     private function buildQrUrl($userId)
     {
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
-        return $protocol . $_SERVER['HTTP_HOST'] . '/perfil/' . $userId;
+        return $protocol . $_SERVER['HTTP_HOST'] . '/perfil?id=' . $userId;
     }
 
 }
