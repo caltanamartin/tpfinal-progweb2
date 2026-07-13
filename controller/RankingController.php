@@ -11,7 +11,7 @@ class RankingController
         $this->usuarioModel = $usuarioModel;
     }
 
-    public function ver()
+    public function index()
     {
         $usuario = Auth::usuario();
         $rolFiltro = ($usuario && $usuario['rol'] === 'usuario') ? 'usuario' : null;

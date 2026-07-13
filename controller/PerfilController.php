@@ -13,7 +13,7 @@ class PerfilController
         $this->request = $request;
     }
 
-    public function ver($id = null)
+    public function index($id = null)
     {
         if ($id) {
             if (!Validator::positiveInt($id)) {

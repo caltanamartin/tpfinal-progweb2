@@ -42,7 +42,7 @@ class Router
 
     private function resolveDefaultMethod($controller)
     {
-        foreach ([$this->defaultMethod, 'index', 'ver'] as $method) {
+        foreach ([$this->defaultMethod, 'ver'] as $method) {
             if (method_exists($controller, $method)) {
                 return $method;
             }

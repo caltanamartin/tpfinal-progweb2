@@ -117,7 +117,7 @@ class Configurator {
 
     public function getRouter()
     {
-        return new Router($this, 'home', 'ver');
+        return new Router($this, 'home', 'index');
     }
 
     public function getOrDefault($controllerName, $defaultControllerName)
