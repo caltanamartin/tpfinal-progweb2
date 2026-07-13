@@ -38,7 +38,7 @@ class JuegoController
     {
         $usuario = Auth::requerirLogin();
 
-        $partidaId = $_REQUEST['id'] ?? null;
+        $partidaId = $this->request->get('id');
         if (!Validator::positiveInt($partidaId)) {
             Redirect::toIndex();
         }

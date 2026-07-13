@@ -15,7 +15,7 @@ class HomeController
         $this->usuarioModel = $usuarioModel;
     }
 
-    public function ver()
+    public function index()
     {
         $usuario = Auth::usuario();
         $data = ["esHome" => true];

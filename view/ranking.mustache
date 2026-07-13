@@ -8,7 +8,7 @@
         {{/usuarios}}
 
         {{#usuarios}}
-        <a href="/perfil/{{id}}" class="flex items-center gap-4 bg-white rounded-xl px-5 py-4 mb-3 border border-gray-200 shadow-sm hover:border-[#00b582] hover:shadow-md transition-all duration-200">
+        <a href="/perfil?id={{id}}" class="flex items-center gap-4 bg-white rounded-xl px-5 py-4 mb-3 border border-gray-200 shadow-sm hover:border-[#00b582] hover:shadow-md transition-all duration-200">
             <span class="text-lg font-bold text-gray-400 w-8 text-center">{{posicion}}</span>
             <div class="w-10 h-10 rounded-full bg-gray-100 overflow-hidden flex-shrink-0 border-2 border-gray-200">
                 {{#foto_perfil}}

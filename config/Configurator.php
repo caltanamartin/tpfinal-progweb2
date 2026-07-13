@@ -40,7 +40,7 @@ class Configurator {
     }
 
     public function getVerificarController() {
-        return new VerificarController($this->getUsuarioModel(), $this->getRenderer());
+        return new VerificarController($this->getUsuarioModel(), $this->getRenderer(), new Request());
     }
 
     public function getTrampitasController() {
@@ -117,7 +117,7 @@ class Configurator {
 
     public function getRouter()
     {
-        return new Router($this, 'home', 'ver');
+        return new Router($this, 'home');
     }
 
     public function getOrDefault($controllerName, $defaultControllerName)

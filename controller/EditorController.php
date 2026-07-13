@@ -59,10 +59,11 @@ class EditorController
         $this->renderer->render('editor_preguntas', $data);
     }
 
-    public function editarPregunta($id = null)
+    public function editarPregunta()
     {
         $usuario = Auth::requerirEditorOAdmin();
 
+        $id = $this->request->get('id');
         if (!Validator::positiveInt($id)) {
             Redirect::to($this->backUrl($usuario));
         }

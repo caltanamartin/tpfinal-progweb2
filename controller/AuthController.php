@@ -97,7 +97,7 @@ class AuthController
                     $this->model->saveToken($usuario['id'], $token);
 
                     $baseUrl = (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'];
-                    $link = $baseUrl . '/verificar/' . $token;
+                    $link = $baseUrl . '/verificar?token=' . $token;
 
                     $subject = "Verificá tu cuenta en PreguntaTres";
                     $body = "<h1>Bienvenido a PreguntaTres</h1>
@@ -120,7 +120,7 @@ class AuthController
     {
         $token = $this->request->get('token');
         if ($token) {
-            Redirect::to('/verificar/' . $token);
+            Redirect::to('/verificar?token=' . $token);
         }
         Redirect::toIndex();
     }
