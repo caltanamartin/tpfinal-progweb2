@@ -13,7 +13,7 @@ class VerificarController
         $this->request  = $request;
     }
 
-    public function verificar()
+    public function index()
     {
         $token = $this->request->get('token');
         $usuario = $this->model->findByToken($token);
